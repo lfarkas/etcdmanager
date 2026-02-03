@@ -120,7 +120,7 @@ export class ConfigService {
                     ? ['-----END CERTIFICATE-----']
                     : ['-----END PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----', '-----END EC PRIVATE KEY-----'];
 
-                for (let i = 0; i < beginMarkers.length; i++) {
+                for (let i = 0; i < beginMarkers.length; i += 1) {
                     const beginMarker = beginMarkers[i];
                     const endMarker = endMarkers[i];
                     const beginIdx = str.indexOf(beginMarker);

@@ -240,7 +240,8 @@ export default {
                     certChain: {
                         label: 'Client Certificate',
                         tooltip:
-                            'Client certificate for mutual TLS authentication. Needed only when client-certificate-auth is enabled in ETCD.',
+                            'Client certificate for mutual TLS authentication. ' +
+                            'Needed only when client-certificate-auth is enabled in ETCD.',
                     },
                     ssl: {
                         label: 'Secure connection',
