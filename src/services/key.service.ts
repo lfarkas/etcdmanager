@@ -5,7 +5,7 @@ import {
     RevisionListType,
     GenericObject,
 } from './../../types/index';
-import { MultiRangeBuilder, Etcd3, DeleteBuilder } from 'etcd3';
+import { MultiRangeBuilder, Etcd3, DeleteBuilder, Role } from 'etcd3';
 import EtcdService from './etcd.service';
 
 export default class KeyService extends EtcdService implements DataService {
@@ -51,10 +51,14 @@ export default class KeyService extends EtcdService implements DataService {
 
     private async mkAuthQueries(isPut: boolean = true): Promise<Promise<{ [key: string]: string; }>[]> {
         const auth = store.state.etcdAuth.username;
-        const user = await this.client.user(auth).roles();
+        const roles = await this.client.user(auth).roles();
+
+        // Fetch all permissions in parallel to avoid N+1 queries
+        const permissionsPromises = roles.map((role: Role) => role.permissions());
+        const allPermissions = await Promise.all(permissionsPromises);
+
         const queries: Promise<{ [key: string]: string; }>[] = [];
-        for (const role of user) {
-            const permissions = await role.permissions();
+        for (const permissions of allPermissions) {
             for (const permission of permissions) {
                 let query: MultiRangeBuilder | DeleteBuilder;
                 if (isPut) {
@@ -74,8 +78,7 @@ export default class KeyService extends EtcdService implements DataService {
             }
         }
 
-
-        return Promise.resolve(queries);
+        return queries;
     }
 
     public async loadAllKeys(prefix?: string): Promise<any> {
@@ -118,7 +121,9 @@ export default class KeyService extends EtcdService implements DataService {
 
             if (ttlNum) {
                 const  tid = setTimeout(() => {
-                    clientOrLease.revoke();
+                    clientOrLease.revoke().catch((err: Error) => {
+                        console.error('Failed to revoke lease:', err);
+                    });
                     clearTimeout(tid);
                 }, ttlNum * 1000);
             }

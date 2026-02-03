@@ -102,8 +102,17 @@ export default class WatcherService extends EtcdService implements DataService {
     }
 
     public listWatchers(): WatcherEntry[] {
-        const watchers = JSON.parse(this.ls.get('watchers')) || [];
-        return watchers;
+        try {
+            const watchersStr = this.ls.get('watchers');
+            if (!watchersStr) {
+                return [];
+            }
+            const watchers = JSON.parse(watchersStr);
+            return Array.isArray(watchers) ? watchers : [];
+        } catch (e) {
+            console.error('Failed to parse watchers from localStorage:', e);
+            return [];
+        }
     }
 
     public saveWatcher(watcher: WatcherEntry, isCreate: boolean = false): boolean {

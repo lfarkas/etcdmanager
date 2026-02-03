@@ -62,7 +62,14 @@ export class BaseEditor extends Vue {
     }
 
     protected unbindDefaultEvents() {
-        this.keyboardEvents = this.keyboardEvents.reset();
+        if (this.keyboardEvents) {
+            this.keyboardEvents.reset();
+        }
+    }
+
+    public destroyed() {
+        // Clean up keyboard events to prevent memory leaks
+        this.unbindDefaultEvents();
     }
 
     public translateHeaders(...keys: string[]) {
@@ -95,15 +102,24 @@ export class BaseEditor extends Vue {
         this.$emit('cancel');
     }
 
+    private loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+
     public toggleLoading() {
+        // Clear any pending timeout to avoid race conditions
+        if (this.loadingTimeout) {
+            clearTimeout(this.loadingTimeout);
+            this.loadingTimeout = null;
+        }
+
         if (store.state.loading) {
-            setTimeout(() => {
+            // Delay hiding the loading state to prevent flickering
+            this.loadingTimeout = setTimeout(() => {
                 store.commit('loading');
-            },         500);
+                this.loadingTimeout = null;
+            }, 500);
         } else {
             store.commit('loading');
         }
-
     }
 
     protected submit() { }

@@ -21,9 +21,12 @@ export class ConfigService {
         return this;
     }
 
-    public getProfile(name: string): string[] {
+    public getProfile(name: string): GenericObject | null {
         const cnf = this.getConfig();
-        return cnf.profiles.find((c: any) => c.config.name === name);
+        if (!cnf || !cnf.profiles || !Array.isArray(cnf.profiles)) {
+            return null;
+        }
+        return cnf.profiles.find((c: any) => c.config.name === name) || null;
     }
 
     public getProfileNames() {
@@ -48,8 +51,11 @@ export class ConfigService {
 
     public loadProfile(profile: string): ConfigService {
         const oldCfg = this.getProfile(profile);
-        this.replaceConfigState(oldCfg);
-
+        if (oldCfg) {
+            this.replaceConfigState(oldCfg);
+        } else {
+            console.warn(`Profile "${profile}" not found`);
+        }
         return this;
     }
 
@@ -60,10 +66,13 @@ export class ConfigService {
             cfg.profiles = cfg.profiles.filter(
                 (conf: any) => conf.config.name !== profile
             );
+            this.setConfig(cfg);
         }
 
-        this.setConfig(cfg);
-        this.replaceConfigState(this.getProfile('default'));
+        const defaultProfile = this.getProfile('default');
+        if (defaultProfile) {
+            this.replaceConfigState(defaultProfile);
+        }
 
         return this;
     }

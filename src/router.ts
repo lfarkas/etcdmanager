@@ -6,7 +6,7 @@ import RoleManager from './components/role-manager.vue';
 import HealthCheck from './components/health.vue';
 import Configuration from './components/config.vue';
 import LeaseManager from './components/lease-manager.vue';
-import WatcherManager from './components/watcher_manager.vue';
+import WatcherManager from './components/watcher-manager.vue';
 import About from './components/about.vue';
 import { isConfiguredGuard } from './guards/guards';
 
@@ -47,6 +47,7 @@ export default new Router({
             path: '/leases',
             name: 'leases',
             component: LeaseManager,
+            beforeEnter: isConfiguredGuard,
         },
         {
             path: '/cluster',

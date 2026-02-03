@@ -38,6 +38,13 @@ const isDevelopment = process.env.NODE_ENV !== 'production';
 const isMac = process.platform === 'darwin';
 let menu: Menu | null = null;
 
+// Environment-conditional logging
+const log = (...args: any[]) => {
+    if (isDevelopment) {
+        console.log(...args);
+    }
+};
+
 declare const __static: any;
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -390,7 +397,7 @@ function setAboutPanel(_translations: any = defaultTranslations.default.en) {
 }
 
 function createWindow() {
-    console.log('[background.ts] createWindow called');
+    log('[background.ts] createWindow called');
     // Create the browser window.
     const mainOpts = {
         width: 800,
@@ -413,14 +420,14 @@ function createWindow() {
         },
     };
 
-    console.log('[background.ts] Creating splash screen...');
+    log('[background.ts] Creating splash screen...');
     win = Splashscreen.initSplashScreen(config);
-    console.log('[background.ts] Splash screen created, win:', !!win);
+    log('[background.ts] Splash screen created, win:', !!win);
 
     // Enable @electron/remote for this window
-    console.log('[background.ts] Enabling remote...');
+    log('[background.ts] Enabling remote...');
     enableRemote(win.webContents);
-    console.log('[background.ts] Remote enabled');
+    log('[background.ts] Remote enabled');
 
     win.setTitle('ETCD Manager');
     win.on('page-title-updated', (e) => {
@@ -446,14 +453,22 @@ function createWindow() {
 }
 ipcMain.on('ssl_file_check', (_event: any, cert: string, id: string) => {
     try {
-        const data = readFileSync(cert);
+        // Validate the file path to prevent path traversal attacks
+        const resolvedPath = require('path').resolve(cert);
+        // Ensure the path doesn't contain suspicious patterns
+        if (resolvedPath.includes('..') || !require('fs').existsSync(resolvedPath)) {
+            win.webContents.send('error-notification', 'common.messages.invalidFilePath');
+            return;
+        }
+        const data = readFileSync(resolvedPath);
         win.webContents.send('ssl_data', {
             id,
             data,
-            fileName: cert,
+            fileName: resolvedPath,
         });
     } catch (e) {
-        throw e;
+        console.error('Failed to read SSL file:', e);
+        win.webContents.send('error-notification', 'common.messages.fileReadError');
     }
 });
 ipcMain.on('ssl_dialog_open', (_event: any, id: string) => {
@@ -496,11 +511,11 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-    console.log('[background.ts] App ready event fired');
+    log('[background.ts] App ready event fired');
     // Initialize @electron/remote
-    console.log('[background.ts] Initializing remote...');
+    log('[background.ts] Initializing remote...');
     initializeRemote();
-    console.log('[background.ts] Remote initialized');
+    log('[background.ts] Remote initialized');
 
     // Skip Vue Devtools - deprecated and causes issues with Electron 22+
     // if (isDevelopment && !process.env.IS_TEST) {
@@ -510,11 +525,11 @@ app.on('ready', async () => {
     //         console.error('Vue Devtools failed to install:', e.toString());
     //     }
     // }
-    console.log('[background.ts] Creating app menu...');
+    log('[background.ts] Creating app menu...');
     createAppMenu(defaultTranslations.default.en);
-    console.log('[background.ts] Setting about panel...');
+    log('[background.ts] Setting about panel...');
     setAboutPanel();
-    console.log('[background.ts] Calling createWindow...');
+    log('[background.ts] Calling createWindow...');
     createWindow();
     // tslint:disable-next-line: variable-name
     ipcMain.on(

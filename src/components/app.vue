@@ -34,6 +34,7 @@ export default class App extends Vue {
     private configService: ConfigService;
     // @ts-ignore
     private statsService: StatsService;
+    private ipcListeners: { channel: string; listener: (...args: any[]) => void }[] = [];
 
     constructor() {
         super();
@@ -47,10 +48,12 @@ export default class App extends Vue {
     }
 
     created() {
-        // @ts-ignore
-        ipcRenderer.on('navigate', (event: any, message: any) => {
+        // Store IPC listeners for cleanup
+        const navigateListener = (_event: any, message: any) => {
             this.$router.push(message);
-        });
+        };
+        ipcRenderer.on('navigate', navigateListener);
+        this.ipcListeners.push({ channel: 'navigate', listener: navigateListener });
 
         this.$store.commit('version', getRemoteApp().getVersion());
         this.$store.commit('package');
@@ -58,8 +61,14 @@ export default class App extends Vue {
         this.whatsNew = !this.localStorageService.getRaw(
             `news${getRemoteApp().getVersion()}`
         );
+    }
 
-
+    beforeDestroy() {
+        // Clean up IPC listeners to prevent memory leaks
+        this.ipcListeners.forEach(({ channel, listener }) => {
+            ipcRenderer.removeListener(channel, listener);
+        });
+        this.ipcListeners = [];
     }
 
     get currentProfile() {
@@ -129,22 +138,24 @@ export default class App extends Vue {
             );
         }
 
-        ipcRenderer.on('config-data', (...args: any[]) => {
+        // Store IPC listeners for cleanup
+        const configDataListener = (...args: any[]) => {
             const profiles = args[1];
             replaceConfig(profiles.profiles[0]);
             this.configService.setConfig(profiles);
             this.$store.commit('message', Messages.success());
-        });
+        };
+        ipcRenderer.on('config-data', configDataListener);
+        this.ipcListeners.push({ channel: 'config-data', listener: configDataListener });
 
-        ipcRenderer.on(
-            'error-notification',
-            (_event: IpcRendererEvent, message: string) => {
-                this.$store.commit(
-                    'message',
-                    Messages.error(this.$t(message).toString())
-                );
-            }
-        );
+        const errorNotificationListener = (_event: IpcRendererEvent, message: string) => {
+            this.$store.commit(
+                'message',
+                Messages.error(this.$t(message).toString())
+            );
+        };
+        ipcRenderer.on('error-notification', errorNotificationListener);
+        this.ipcListeners.push({ channel: 'error-notification', listener: errorNotificationListener });
 
         const client = this.$store.state.connection.getClient();
         if (client) {
@@ -157,7 +168,6 @@ export default class App extends Vue {
                 console.error('Failed to get etcd stats:', e);
             }
         }
-
     }
 }
 </script>

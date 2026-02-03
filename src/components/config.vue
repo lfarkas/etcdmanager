@@ -1397,6 +1397,9 @@ export default class Configuration extends Vue {
     public platformService: PlatformService;
     public helpbar: any = 0;
 
+    private ipcListeners: { channel: string; listener: (...args: any[]) => void }[] = [];
+    private keyboardEvents: any = null;
+
     constructor() {
         super();
         this.certification = Buffer.alloc(0);
@@ -1410,24 +1413,27 @@ export default class Configuration extends Vue {
     }
 
     created() {
-        const keyboardEvents = new Mousetrap();
-        keyboardEvents.bind(['ctrl+s', 'meta+s'], () => {
+        // Store keyboard events for cleanup
+        this.keyboardEvents = new Mousetrap();
+        this.keyboardEvents.bind(['ctrl+s', 'meta+s'], () => {
             this.persist();
         });
-        keyboardEvents.bind('right', () => {
+        this.keyboardEvents.bind('right', () => {
             this.next();
         });
-        keyboardEvents.bind('left', () => {
+        this.keyboardEvents.bind('left', () => {
             this.prev();
         });
-        keyboardEvents.bind(
+        this.keyboardEvents.bind(
             ['ctrl+h', 'meta+h'],
             (e: ExtendedKeyboardEvent) => {
                 e.preventDefault();
                 this.help = this.help === null ? 0 : null;
             }
         );
-        ipcRenderer.on('ssl_data', (_event: any, arg: any) => {
+
+        // SSL data listener
+        const sslDataListener = (_event: any, arg: any) => {
             // Convert IPC-serialized data back to Buffer
             const toBuffer = (data: any): Buffer => {
                 if (Buffer.isBuffer(data)) {
@@ -1501,9 +1507,12 @@ export default class Configuration extends Vue {
 
             // Debug: verify buffers are retained
             console.log('[config.vue] After ssl_data - certification:', this.certification?.length, 'privateKey:', this.privateKey?.length, 'certificationChain:', this.certificationChain?.length);
-        });
+        };
+        ipcRenderer.on('ssl_data', sslDataListener);
+        this.ipcListeners.push({ channel: 'ssl_data', listener: sslDataListener });
 
-        ipcRenderer.on('app-config-data', (_event: any, saveTo: string) => {
+        // App config data listener
+        const appConfigDataListener = (_event: any, saveTo: string) => {
             try {
                 writeFileSync(
                     saveTo,
@@ -1511,17 +1520,36 @@ export default class Configuration extends Vue {
                     { encoding: 'utf8' }
                 );
             } catch (e) {
-                throw e;
+                console.error('Failed to write config file:', e);
             }
-        });
+        };
+        ipcRenderer.on('app-config-data', appConfigDataListener);
+        this.ipcListeners.push({ channel: 'app-config-data', listener: appConfigDataListener });
 
-        ipcRenderer.on('config-data', () => {
+        // Config data listener
+        const configDataListener = () => {
             this.profiles = this.configService.getProfileNames();
             this.profile = this.$store.getters.currentProfileName;
-        });
+        };
+        ipcRenderer.on('config-data', configDataListener);
+        this.ipcListeners.push({ channel: 'config-data', listener: configDataListener });
 
         this.profiles = this.configService.getProfileNames();
         this.authService = new AuthService();
+    }
+
+    beforeDestroy() {
+        // Clean up IPC listeners to prevent memory leaks
+        this.ipcListeners.forEach(({ channel, listener }) => {
+            ipcRenderer.removeListener(channel, listener);
+        });
+        this.ipcListeners = [];
+
+        // Clean up keyboard events
+        if (this.keyboardEvents) {
+            this.keyboardEvents.reset();
+            this.keyboardEvents = null;
+        }
     }
 
     updated() {

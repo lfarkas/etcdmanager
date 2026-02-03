@@ -5,14 +5,22 @@ import Mousetrap from 'mousetrap';
 @Component({
 })
 export default class Dialog extends Vue {
+    private keyboardEvents: ReturnType<typeof Mousetrap> | null = null;
 
     mounted() {
-        // @ts-ignore
-        const keyboardEvents = new Mousetrap();
-        keyboardEvents.stopCallback = () => false;
-        keyboardEvents.bind('esc', () => {
+        this.keyboardEvents = new Mousetrap();
+        this.keyboardEvents.stopCallback = () => false;
+        this.keyboardEvents.bind('esc', () => {
             this.cancel();
         });
+    }
+
+    beforeDestroy() {
+        // Clean up keyboard events to prevent memory leaks
+        if (this.keyboardEvents) {
+            this.keyboardEvents.reset();
+            this.keyboardEvents = null;
+        }
     }
 
     confirm() {

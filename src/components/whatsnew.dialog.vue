@@ -48,6 +48,7 @@ export default class WhatsNewDialog extends Dialog {
 
     public content: string = '';
     private localStorageService: LocalStorageService;
+    private whatsnewListener: ((...args: any[]) => void) | null = null;
 
     constructor() {
         super();
@@ -65,9 +66,18 @@ export default class WhatsNewDialog extends Dialog {
 
     created() {
         ipcRenderer.send('whatsnew-load');
-        ipcRenderer.on('whatsnew-data', (...args: any[]) => {
+        this.whatsnewListener = (...args: any[]) => {
             this.content = args[1];
-        });
+        };
+        ipcRenderer.on('whatsnew-data', this.whatsnewListener);
+    }
+
+    beforeDestroy() {
+        // Clean up IPC listener to prevent memory leaks
+        if (this.whatsnewListener) {
+            ipcRenderer.removeListener('whatsnew-data', this.whatsnewListener);
+            this.whatsnewListener = null;
+        }
     }
 }
 </script>

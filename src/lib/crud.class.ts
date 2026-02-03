@@ -59,6 +59,10 @@ export class CrudBase extends Vue implements List {
         if (this.reloader) {
             this.reloader.cancel();
         }
+        // Clean up keyboard events to prevent memory leaks
+        if (this.keyboardEvents) {
+            this.keyboardEvents.reset();
+        }
     }
 
     protected bindDefaultEvents() {
@@ -220,11 +224,21 @@ export class CrudBase extends Vue implements List {
         return Promise.resolve(this);
     }
 
+    private loadingTimeout: ReturnType<typeof setTimeout> | null = null;
+
     public toggleLoading() {
+        // Clear any pending timeout to avoid race conditions
+        if (this.loadingTimeout) {
+            clearTimeout(this.loadingTimeout);
+            this.loadingTimeout = null;
+        }
+
         if (store.state.loading) {
-            setTimeout(() => {
+            // Delay hiding the loading state to prevent flickering
+            this.loadingTimeout = setTimeout(() => {
                 store.commit('loading');
-            },         500);
+                this.loadingTimeout = null;
+            }, 500);
         } else {
             store.commit('loading');
         }
