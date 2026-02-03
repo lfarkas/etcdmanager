@@ -62,6 +62,8 @@ module.exports = {
             // @electron/remote must also be externalized for renderer process
             externals: ['dns', 'http2', 'tls', 'net', 'fs', 'path', '@electron/remote'],
             nodeIntegration: true,
+            // Disable modern mode to avoid type="module" scripts that don't work with app:// protocol
+            modern: false,
             builderOptions: {
                 directories: {
                     buildResources: './build_files',
@@ -183,8 +185,13 @@ module.exports = {
                         to: 'node_modules/protobufjs/dist/google/protobuf',
                     },
                 ],
-                // Note: etcd3 1.x uses @grpc/grpc-js which handles proto files internally
-                // No extraResources needed for proto files anymore
+                // Include etcd3 proto files for gRPC
+                extraResources: [
+                    {
+                        from: 'node_modules/etcd3/proto',
+                        to: 'proto',
+                    },
+                ],
             },
         },
     },

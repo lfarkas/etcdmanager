@@ -88,11 +88,5 @@
             </div>
         </div>
     </body>
-    <script>
-        // Listen for data from browser process and update splashscreen
-        var ipcRenderer = require('electron').ipcRenderer;
-        ipcRenderer.on('update', function(event, status) {
-            document.getElementById('status').innerText = status;
-        });
-    </script>
+    <!-- IPC not needed for simple splash screen -->
 </html>
