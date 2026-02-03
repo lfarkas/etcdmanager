@@ -13,8 +13,12 @@ import { isConfiguredGuard } from './guards/guards';
 
 Vue.use(Router);
 
+// Check if running in Electron
+const isElectron = typeof window !== 'undefined' && window.process && window.process.type === 'renderer';
+
 export default new Router({
-    mode: 'history',
+    // Use hash mode for Electron compatibility with app:// protocol
+    mode: isElectron ? 'hash' : 'history',
     base: process.env.BASE_URL,
     routes: [
         {

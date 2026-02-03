@@ -313,6 +313,7 @@ import { IMember, IAlarmResponse, IStatusResponse } from 'etcd3';
 import Messages from '../lib/messages';
 import { GenericObject } from '../../types';
 import { PlatformService } from '../services/platform.service';
+import Mousetrap, { ExtendedKeyboardEvent } from 'mousetrap';
 
 @Component({
     name: 'health-check',

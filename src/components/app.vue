@@ -9,7 +9,15 @@ import { ConfigService } from '../services/config.service';
 import WhatsNewDialog from './whatsnew.dialog.vue';
 import Messages from '../lib/messages';
 import StatsService from '../services/stats.service';
-const app = require('electron').remote.app
+
+// Lazy-load @electron/remote to avoid initialization timing issues
+let remoteApp: Electron.App | null = null;
+function getRemoteApp(): Electron.App {
+    if (!remoteApp) {
+        remoteApp = require('@electron/remote').app;
+    }
+    return remoteApp!;
+}
 
 @Component({
     name: 'App',
@@ -44,11 +52,11 @@ export default class App extends Vue {
             this.$router.push(message);
         });
 
-        this.$store.commit('version', app.getVersion());
+        this.$store.commit('version', getRemoteApp().getVersion());
         this.$store.commit('package');
 
         this.whatsNew = !this.localStorageService.getRaw(
-            `news${app.getVersion()}`
+            `news${getRemoteApp().getVersion()}`
         );
 
 
@@ -138,11 +146,17 @@ export default class App extends Vue {
             }
         );
 
-        this.statsService = new StatsService(this.$store.state.connection.getClient());
-        const stats = await this.statsService.getStats();
-
-        this.$store.commit('etcdConfig', {version: parseFloat(stats.version) });
-        ipcRenderer.send('update-menu', undefined, { lease: this.$store.state.etcd.version > 3.2});
+        const client = this.$store.state.connection.getClient();
+        if (client) {
+            try {
+                this.statsService = new StatsService(client);
+                const stats = await this.statsService.getStats();
+                this.$store.commit('etcdConfig', {version: parseFloat(stats.version) });
+                ipcRenderer.send('update-menu', undefined, { lease: this.$store.state.etcd.version > 3.2});
+            } catch (e) {
+                console.error('Failed to get etcd stats:', e);
+            }
+        }
 
     }
 }

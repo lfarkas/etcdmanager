@@ -448,8 +448,8 @@ export default class KeyEditor extends BaseEditor {
     // @ts-ignore
     @Prop() mode: string;
 
-    public key: string = this.data.key || '';
-    public value: string = this.data.value || '';
+    public key: string = '';
+    public value: string = '';
     public ttl: string = '0';
     public showRevs: number | null = null;
 
@@ -504,6 +504,8 @@ export default class KeyEditor extends BaseEditor {
     }
 
     created() {
+        this.key = this.data?.key || '';
+        this.value = this.data?.value || '';
         this.translateHeaders(
             'keyEditor.columns.key',
             'keyEditor.columns.version',

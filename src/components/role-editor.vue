@@ -313,7 +313,7 @@ export default class RoleEditor extends BaseEditor {
     public permissionDialog: boolean = false;
     public roleExists: boolean = false;
     public selected: GenericObject[] = [];
-    public name: string = this.data.name || '';
+    public name: string = '';
     public currentPermission: PermissionObject;
     public defaultPermission: PermissionObject = {
         key: '',
@@ -354,6 +354,7 @@ export default class RoleEditor extends BaseEditor {
     }
 
     async created() {
+        this.name = this.data?.name || '';
         if (this.name) {
             this.loadPermissions();
         }

@@ -328,7 +328,7 @@ export default class UserEditor extends BaseEditor {
     // @ts-ignore
     @Prop() mode: string;
 
-    public name: string = this.data.name || '';
+    public name: string = '';
     public password: string = '';
     public pwcheck: string = '';
     public showPassword: boolean = false;
@@ -411,9 +411,10 @@ export default class UserEditor extends BaseEditor {
     }
 
     public async created() {
+        this.name = this.data?.name || '';
         try {
             this.roles = await this.roleService.getRoles();
-            this.ownRoles = this.data.roles
+            this.ownRoles = this.data?.roles
                 ? this.data.roles.map((role) => {
                       return role.name;
                   })

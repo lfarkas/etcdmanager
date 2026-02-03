@@ -5,7 +5,7 @@ import { GenericObject } from './../../types/index';
 import EtcdService from '@/services/etcd.service';
 import Component from 'vue-class-component';
 import store from '@/store';
-import Mousetrap from 'mousetrap';
+import Mousetrap, { ExtendedKeyboardEvent } from 'mousetrap';
 
 export interface List {
     load(prefix?: string): Promise<CrudBase>;

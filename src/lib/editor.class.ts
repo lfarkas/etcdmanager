@@ -7,7 +7,7 @@ import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { capitalize } from 'lodash-es';
 import store from '@/store';
-import Mousetrap from 'mousetrap';
+import Mousetrap, { ExtendedKeyboardEvent } from 'mousetrap';
 
 @Component({
 })

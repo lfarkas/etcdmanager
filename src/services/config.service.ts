@@ -84,15 +84,68 @@ export class ConfigService {
         }
 
         if (config.credentials && config.credentials.rootCertificate) {
-            config.credentials.rootCertificate = new Buffer(
-                config.credentials.rootCertificate
+            // Handle various Buffer serialization formats
+            const toBuffer = (data: any): Buffer => {
+                if (Buffer.isBuffer(data)) {
+                    return data;
+                }
+                if (typeof data === 'string') {
+                    return Buffer.from(data);
+                }
+                if (Array.isArray(data)) {
+                    return Buffer.from(data);
+                }
+                if (data && data.type === 'Buffer' && Array.isArray(data.data)) {
+                    return Buffer.from(data.data);
+                }
+                // Handle object with numeric keys (like {0: 45, 1: 45, 2: 45, ...})
+                if (data && typeof data === 'object') {
+                    const keys = Object.keys(data);
+                    if (keys.length > 0 && keys.every(k => !isNaN(Number(k)))) {
+                        const arr = keys.sort((a, b) => Number(a) - Number(b)).map(k => data[k]);
+                        return Buffer.from(arr);
+                    }
+                }
+                console.error('[config.service] Unknown buffer format:', data);
+                throw new Error('Unknown buffer format');
+            };
+
+            // Extract PEM portion from data that may contain text header
+            const extractPem = (buf: Buffer, type: 'CERTIFICATE' | 'PRIVATE KEY'): Buffer => {
+                const str = buf.toString('utf8');
+                const beginMarkers = type === 'CERTIFICATE'
+                    ? ['-----BEGIN CERTIFICATE-----']
+                    : ['-----BEGIN PRIVATE KEY-----', '-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN EC PRIVATE KEY-----'];
+                const endMarkers = type === 'CERTIFICATE'
+                    ? ['-----END CERTIFICATE-----']
+                    : ['-----END PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----', '-----END EC PRIVATE KEY-----'];
+
+                for (let i = 0; i < beginMarkers.length; i++) {
+                    const beginMarker = beginMarkers[i];
+                    const endMarker = endMarkers[i];
+                    const beginIdx = str.indexOf(beginMarker);
+                    if (beginIdx !== -1) {
+                        const endIdx = str.indexOf(endMarker, beginIdx);
+                        if (endIdx !== -1) {
+                            return Buffer.from(str.substring(beginIdx, endIdx + endMarker.length), 'utf8');
+                        }
+                    }
+                }
+                return buf;
+            };
+
+            config.credentials.rootCertificate = extractPem(
+                toBuffer(config.credentials.rootCertificate),
+                'CERTIFICATE'
             );
             if (config.credentials.privateKey && config.credentials.certChain) {
-                config.credentials.privateKey = new Buffer(
-                    config.credentials.privateKey
+                config.credentials.privateKey = extractPem(
+                    toBuffer(config.credentials.privateKey),
+                    'PRIVATE KEY'
                 );
-                config.credentials.certChain = new Buffer(
-                    config.credentials.certChain
+                config.credentials.certChain = extractPem(
+                    toBuffer(config.credentials.certChain),
+                    'CERTIFICATE'
                 );
             }
         }

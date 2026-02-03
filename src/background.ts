@@ -23,6 +23,7 @@ import { get } from 'lodash-es';
 import * as defaultTranslations from './i18n/en';
 import { autoUpdater } from 'electron-updater';
 import marked from 'marked';
+import { initialize as initializeRemote, enable as enableRemote } from '@electron/remote/main';
 
 const pkg = JSON.parse(
     readFileSync(
@@ -389,6 +390,7 @@ function setAboutPanel(_translations: any = defaultTranslations.default.en) {
 }
 
 function createWindow() {
+    console.log('[background.ts] createWindow called');
     // Create the browser window.
     const mainOpts = {
         width: 800,
@@ -397,6 +399,7 @@ function createWindow() {
         icon: join(__static, '/icons/64x64.png'),
         webPreferences: {
             nodeIntegration: true,
+            contextIsolation: false,
         },
     };
 
@@ -410,7 +413,15 @@ function createWindow() {
         },
     };
 
+    console.log('[background.ts] Creating splash screen...');
     win = Splashscreen.initSplashScreen(config);
+    console.log('[background.ts] Splash screen created, win:', !!win);
+
+    // Enable @electron/remote for this window
+    console.log('[background.ts] Enabling remote...');
+    enableRemote(win.webContents);
+    console.log('[background.ts] Remote enabled');
+
     win.setTitle('ETCD Manager');
     win.on('page-title-updated', (e) => {
         e.preventDefault();
@@ -485,16 +496,25 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-    if (isDevelopment && !process.env.IS_TEST) {
-        // Install Vue Devtools
-        try {
-            await installVueDevtools();
-        } catch (e) {
-            console.error('Vue Devtools failed to install:', e.toString());
-        }
-    }
+    console.log('[background.ts] App ready event fired');
+    // Initialize @electron/remote
+    console.log('[background.ts] Initializing remote...');
+    initializeRemote();
+    console.log('[background.ts] Remote initialized');
+
+    // Skip Vue Devtools - deprecated and causes issues with Electron 22+
+    // if (isDevelopment && !process.env.IS_TEST) {
+    //     try {
+    //         await installVueDevtools();
+    //     } catch (e) {
+    //         console.error('Vue Devtools failed to install:', e.toString());
+    //     }
+    // }
+    console.log('[background.ts] Creating app menu...');
     createAppMenu(defaultTranslations.default.en);
+    console.log('[background.ts] Setting about panel...');
     setAboutPanel();
+    console.log('[background.ts] Calling createWindow...');
     createWindow();
     // tslint:disable-next-line: variable-name
     ipcMain.on(

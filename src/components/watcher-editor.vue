@@ -447,10 +447,21 @@ export default class WatcherEditor extends BaseEditor {
         event: { name: 'put', value: 0, type: 2 },
     };
     public selected: GenericObject[] = [];
-    public name: string = this.data.name || '';
-    public key: string = this.data.key || '';
-    public prefix: boolean = this.data.prefix || false;
-    public actions: WatcherAction[] = this.data.actions || [];
+    public name: string = '';
+    public key: string = '';
+    public prefix: boolean = false;
+    public actions: WatcherAction[] = [];
+
+    created() {
+        this.name = this.data?.name || '';
+        this.key = this.data?.key || '';
+        this.prefix = this.data?.prefix || false;
+        this.actions = this.data?.actions || [];
+        this.translateHeaders(
+            'watcherEditor.actionList.columns.action',
+            'watcherEditor.actionList.columns.event'
+        );
+    }
 
     public headers = [
         {
@@ -478,13 +489,6 @@ export default class WatcherEditor extends BaseEditor {
             this.addAction();
         });
         this.focus('name');
-    }
-
-    created() {
-        this.translateHeaders(
-            'watcherEditor.actionList.columns.action',
-            'watcherEditor.actionList.columns.event'
-        );
     }
 
     get nameErrors() {

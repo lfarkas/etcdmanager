@@ -94,17 +94,25 @@ export default class ActionEditor extends BaseEditor {
     // @ts-ignore
     @Prop() mode: string;
 
+    public action: GenericObject = {
+        id: null,
+        action: null,
+        event: null,
+    };
+
     mounted() {
         this.bindDefaultEvents('actionForm');
         // @ts-ignore
         this.$nextTick(this.$refs.actionType.focus);
     }
 
-    public action: GenericObject = {
-        id: this.data.id,
-        action: this.data.action,
-        event: this.data.event,
-    };
+    created() {
+        this.action = {
+            id: this.data?.id,
+            action: this.data?.action,
+            event: this.data?.event,
+        };
+    }
 
     public actions: GenericObject[] = [
         { name: 'Print to console', value: 0, type: 1 },

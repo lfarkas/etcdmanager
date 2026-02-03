@@ -1,15 +1,12 @@
 module.exports = {
     assetsDir: 'assets',
     runtimeCompiler: true,
+    // Transpile cockatiel (etcd3 dependency) which uses modern JS syntax
+    transpileDependencies: ['cockatiel'],
     configureWebpack: {
         node: {
             __dirname: true,
             __filename: false,
-        },
-        resolve: {
-            alias: {
-                '@grpc/proto-loader': 'webpack-proto-loader',
-            },
         },
         module: {
             rules: [
@@ -45,8 +42,11 @@ module.exports = {
     },
     pluginOptions: {
         nodeModulesPath: ['../../node_modules', './node_modules'],
-        externals: ['@grpc/proto-loader'],
         electronBuilder: {
+            // Node.js modules used by @grpc/grpc-js need to be externalized
+            // @electron/remote must also be externalized for renderer process
+            externals: ['dns', 'http2', 'tls', 'net', 'fs', 'path', '@electron/remote'],
+            nodeIntegration: true,
             builderOptions: {
                 directories: {
                     buildResources: './build_files',
@@ -168,12 +168,8 @@ module.exports = {
                         to: 'node_modules/protobufjs/dist/google/protobuf',
                     },
                 ],
-                extraResources: [
-                    {
-                        from: 'node_modules/etcd3/lib/proto',
-                        to: 'proto',
-                    },
-                ],
+                // Note: etcd3 1.x uses @grpc/grpc-js which handles proto files internally
+                // No extraResources needed for proto files anymore
             },
         },
     },

@@ -1,10 +1,11 @@
 import { i18n } from '@/main';
 
 export default class Messages {
-    public static error(error: string, translate: boolean = false) {
+    public static error(error: unknown, translate: boolean = false) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         return {
             text:  `${i18n.t('common.messages.error')}.
-            Error: ${translate ? i18n.t(error) : error}`,
+            Error: ${translate ? i18n.t(errorMessage) : errorMessage}`,
             color: 'error',
             show: true,
         };

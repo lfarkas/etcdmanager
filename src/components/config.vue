@@ -1307,6 +1307,7 @@ import { Etcd3, IOptions } from 'etcd3';
 import { AuthService } from '../services/auth.service';
 import StatsService from '../services/stats.service';
 import { writeFileSync } from 'fs';
+import Mousetrap, { ExtendedKeyboardEvent } from 'mousetrap';
 
 const { ipcRenderer } = require('electron');
 
@@ -1398,9 +1399,9 @@ export default class Configuration extends Vue {
 
     constructor() {
         super();
-        this.certification = new Buffer('');
-        this.privateKey = new Buffer('');
-        this.certificationChain = new Buffer('');
+        this.certification = Buffer.alloc(0);
+        this.privateKey = Buffer.alloc(0);
+        this.certificationChain = Buffer.alloc(0);
         this.platformService = new PlatformService();
         this.inputActionService = new InputActionService();
         // @ts-ignore
@@ -1427,18 +1428,79 @@ export default class Configuration extends Vue {
             }
         );
         ipcRenderer.on('ssl_data', (_event: any, arg: any) => {
+            // Convert IPC-serialized data back to Buffer
+            const toBuffer = (data: any): Buffer => {
+                if (Buffer.isBuffer(data)) {
+                    return data;
+                }
+                if (data && data.type === 'Buffer' && Array.isArray(data.data)) {
+                    return Buffer.from(data.data);
+                }
+                if (Array.isArray(data)) {
+                    return Buffer.from(data);
+                }
+                if (data && typeof data === 'object') {
+                    const keys = Object.keys(data);
+                    if (keys.length > 0 && keys.every(k => !isNaN(Number(k)))) {
+                        const arr = keys.sort((a, b) => Number(a) - Number(b)).map(k => data[k]);
+                        return Buffer.from(arr);
+                    }
+                }
+                return Buffer.from(data);
+            };
+
+            // Extract PEM portion from files that contain both text and PEM
+            // (e.g., openssl x509 -text output followed by the actual cert)
+            const extractPem = (buf: Buffer, type: 'CERTIFICATE' | 'PRIVATE KEY' | 'RSA PRIVATE KEY' | 'EC PRIVATE KEY'): Buffer => {
+                const str = buf.toString('utf8');
+                const beginMarkers = type === 'CERTIFICATE'
+                    ? ['-----BEGIN CERTIFICATE-----']
+                    : ['-----BEGIN PRIVATE KEY-----', '-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN EC PRIVATE KEY-----'];
+                const endMarkers = type === 'CERTIFICATE'
+                    ? ['-----END CERTIFICATE-----']
+                    : ['-----END PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----', '-----END EC PRIVATE KEY-----'];
+
+                for (let i = 0; i < beginMarkers.length; i++) {
+                    const beginMarker = beginMarkers[i];
+                    const endMarker = endMarkers[i];
+                    const beginIdx = str.indexOf(beginMarker);
+                    if (beginIdx !== -1) {
+                        const endIdx = str.indexOf(endMarker, beginIdx);
+                        if (endIdx !== -1) {
+                            const pem = str.substring(beginIdx, endIdx + endMarker.length);
+                            console.log('[config.vue] Extracted PEM, length:', pem.length);
+                            return Buffer.from(pem, 'utf8');
+                        }
+                    }
+                }
+                // If no PEM markers found, return original buffer
+                console.log('[config.vue] No PEM markers found, using original data');
+                return buf;
+            };
+
+            console.log('[config.vue] ssl_data received - id:', arg.id, 'fileName:', arg.fileName);
+            const buf = toBuffer(arg.data);
+            const pem = extractPem(buf, arg.id === 'privateKey' ? 'PRIVATE KEY' : 'CERTIFICATE');
+            console.log('[config.vue] ssl_data - extracted PEM preview:', pem.toString('utf8').substring(0, 80));
+
             if (arg.id === 'cert') {
-                this.certification = arg.data;
+                this.certification = pem;
                 this.certificate = arg.fileName;
+                console.log('[config.vue] Set certification (rootCert) from:', arg.fileName, 'length:', this.certification.length);
             }
             if (arg.id === 'privateKey') {
-                this.privateKey = arg.data;
+                this.privateKey = pem;
                 this.certKey = arg.fileName;
+                console.log('[config.vue] Set privateKey from:', arg.fileName, 'length:', this.privateKey.length);
             }
             if (arg.id === 'certChain') {
-                this.certificationChain = arg.data;
+                this.certificationChain = pem;
                 this.certChain = arg.fileName;
+                console.log('[config.vue] Set certificationChain (certChain) from:', arg.fileName, 'length:', this.certificationChain.length);
             }
+
+            // Debug: verify buffers are retained
+            console.log('[config.vue] After ssl_data - certification:', this.certification?.length, 'privateKey:', this.privateKey?.length, 'certificationChain:', this.certificationChain?.length);
         });
 
         ipcRenderer.on('app-config-data', (_event: any, saveTo: string) => {
@@ -1821,15 +1883,79 @@ export default class Configuration extends Vue {
         }
 
         if (this.certificate && this.ssl_enabled) {
+            // Helper to convert serialized buffer data back to Buffer
+            const toBuffer = (data: any): Buffer => {
+                if (Buffer.isBuffer(data)) return data;
+                if (data && data.type === 'Buffer' && Array.isArray(data.data)) {
+                    return Buffer.from(data.data);
+                }
+                if (Array.isArray(data)) return Buffer.from(data);
+                if (data && typeof data === 'object') {
+                    const keys = Object.keys(data);
+                    if (keys.length > 0 && keys.every(k => !isNaN(Number(k)))) {
+                        const arr = keys.sort((a, b) => Number(a) - Number(b)).map(k => data[k]);
+                        return Buffer.from(arr);
+                    }
+                }
+                return Buffer.from(data || '');
+            };
+
+            // Extract PEM portion from data
+            const extractPem = (buf: Buffer, type: 'CERTIFICATE' | 'PRIVATE KEY'): Buffer => {
+                const str = buf.toString('utf8');
+                const beginMarkers = type === 'CERTIFICATE'
+                    ? ['-----BEGIN CERTIFICATE-----']
+                    : ['-----BEGIN PRIVATE KEY-----', '-----BEGIN RSA PRIVATE KEY-----', '-----BEGIN EC PRIVATE KEY-----'];
+                const endMarkers = type === 'CERTIFICATE'
+                    ? ['-----END CERTIFICATE-----']
+                    : ['-----END PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----', '-----END EC PRIVATE KEY-----'];
+
+                for (let i = 0; i < beginMarkers.length; i++) {
+                    const beginIdx = str.indexOf(beginMarkers[i]);
+                    if (beginIdx !== -1) {
+                        const endIdx = str.indexOf(endMarkers[i], beginIdx);
+                        if (endIdx !== -1) {
+                            return Buffer.from(str.substring(beginIdx, endIdx + endMarkers[i].length), 'utf8');
+                        }
+                    }
+                }
+                return buf;
+            };
+
+            // Load credentials from saved config if instance variables are empty
+            let rootCert = this.certification;
+            let privKey = this.privateKey;
+            let certChain = this.certificationChain;
+
+            if (!rootCert || rootCert.length === 0) {
+                const savedConfig: any = this.configService.getProfile(this.profile);
+                if (savedConfig && savedConfig.credentials) {
+                    console.log('[testConnection] Loading credentials from saved config');
+                    if (savedConfig.credentials.rootCertificate) {
+                        rootCert = extractPem(toBuffer(savedConfig.credentials.rootCertificate), 'CERTIFICATE');
+                    }
+                    if (savedConfig.credentials.privateKey) {
+                        privKey = extractPem(toBuffer(savedConfig.credentials.privateKey), 'PRIVATE KEY');
+                    }
+                    if (savedConfig.credentials.certChain) {
+                        certChain = extractPem(toBuffer(savedConfig.credentials.certChain), 'CERTIFICATE');
+                    }
+                }
+            }
+
+            console.log('[testConnection] rootCert length:', rootCert?.length, 'preview:', rootCert?.toString('utf8').substring(0, 50));
             config.credentials = {
-                rootCertificate: this.certification,
+                rootCertificate: rootCert,
             };
             if (this.certKey && this.certChain) {
-                config.credentials.privateKey = this.privateKey;
-                config.credentials.certChain = this.certificationChain;
+                console.log('[testConnection] privateKey length:', privKey?.length, 'preview:', privKey?.toString('utf8').substring(0, 50));
+                console.log('[testConnection] certChain length:', certChain?.length, 'preview:', certChain?.toString('utf8').substring(0, 50));
+                config.credentials.privateKey = privKey;
+                config.credentials.certChain = certChain;
             }
         }
 
+        console.log('[testConnection] Creating Etcd3 client with config:', JSON.stringify({...config, credentials: config.credentials ? 'present' : 'none'}));
         const client = new Etcd3(config);
         this.etcd = new KeyService(client);
         this.testing = true;
@@ -1951,22 +2077,11 @@ export default class Configuration extends Vue {
             this.findError();
             return false;
         }
-        const config = this.configService.getConfig();
-        const credentials =
-            config && config.credentials ? config.credentials : undefined;
-        if (credentials && new Buffer(credentials.rootCertificate).length > 0) {
-            this.certification = new Buffer(credentials.rootCertificate);
-            if (
-                credentials &&
-                credentials.privateKey &&
-                credentials.certChain &&
-                new Buffer(credentials.privateKey).length > 0 &&
-                new Buffer(credentials.certChain).length > 0
-            ) {
-                this.privateKey = new Buffer(credentials.privateKey);
-                this.certificationChain = new Buffer(credentials.certChain);
-            }
-        }
+        // Note: Don't load credentials from old config here - use the freshly selected certificates
+        // stored in this.certification, this.privateKey, this.certificationChain
+        // The certificate data in this.certification, this.privateKey, this.certificationChain
+        // should be used as-is (they were set when user selected files via ssl_data handler).
+
         const newConfig: { [key: string]: any } = {
             etcd: {
                 hosts: this.endpoint,
@@ -2006,12 +2121,18 @@ export default class Configuration extends Vue {
             newConfig.credentials = {
                 rootCertificate: this.certification,
             };
+            console.log('[config.vue] rootCertificate (CA):', this.certificate, 'length:', this.certification.length);
+            console.log('[config.vue] rootCertificate preview:', this.certification.toString('utf8').substring(0, 100));
             if (this.certKey && this.certChain) {
                 newConfig.etcd.ssl.certKey = this.certKey;
                 newConfig.etcd.ssl.certChain = this.certChain;
 
                 newConfig.credentials.privateKey = this.privateKey;
                 newConfig.credentials.certChain = this.certificationChain;
+                console.log('[config.vue] privateKey:', this.certKey, 'length:', this.privateKey.length);
+                console.log('[config.vue] privateKey preview:', this.privateKey.toString('utf8').substring(0, 50));
+                console.log('[config.vue] certChain (client cert):', this.certChain, 'length:', this.certificationChain.length);
+                console.log('[config.vue] certChain preview:', this.certificationChain.toString('utf8').substring(0, 50));
             }
         }
         if (this.pwpattern) {

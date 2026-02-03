@@ -52,7 +52,11 @@ export default class SaveAsDialog extends Dialog {
     // @ts-ignore
     @Prop() itemName: string;
 
-    public profile: string = this.itemName;
+    public profile: string = '';
+
+    created() {
+        this.profile = this.itemName || '';
+    }
 
     public submit(): SaveAsDialog {
         this.$emit('saveAs', this.profile);

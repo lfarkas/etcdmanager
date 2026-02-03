@@ -184,12 +184,19 @@ export default class PermissionEditor extends BaseEditor {
     public itemId: string = 'key';
     public itemType: string = 'permission';
     public actionDialog: boolean = false;
-    public key: string = this.data.key || '';
+    public key: string = '';
     public radios: string = '';
-    public permission: GenericObject = this.data.permission || {
+    public permission: GenericObject = {
         name: 'Read',
         value: 'Read',
     };
+
+    created() {
+        this.key = this.data?.key || '';
+        if (this.data?.permission) {
+            this.permission = this.data.permission;
+        }
+    }
 
     public permissionValues: GenericObject[] = [
         {

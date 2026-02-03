@@ -7,10 +7,21 @@ import { i18n, loadedLang } from './main';
 import { join } from 'path';
 import VueI18n from 'vue-i18n';
 import { CurrentProfileType } from '../types';
-const {
-    ipcRenderer,
-    remote: { app },
-} = require('electron');
+const { ipcRenderer } = require('electron');
+
+// Lazy-load @electron/remote to avoid initialization timing issues
+let remoteApp: Electron.App | null = null;
+function getRemoteApp(): Electron.App {
+    if (!remoteApp) {
+        try {
+            remoteApp = require('@electron/remote').app;
+        } catch (e) {
+            console.error('Failed to load @electron/remote:', e);
+            throw e;
+        }
+    }
+    return remoteApp!;
+}
 
 Vue.use(Vuex);
 
@@ -148,7 +159,7 @@ export default new Vuex.Store({
                 readFileSync(
                     join(
                         process.platform !== 'win32' ? '/' : '',
-                        app.getAppPath(),
+                        getRemoteApp().getAppPath(),
                         'package.json'
                     )
                 ).toString()

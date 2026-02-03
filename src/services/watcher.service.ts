@@ -1,8 +1,7 @@
 import { WatcherAction, DataService } from './../../types/index';
 import {
-    Etcd3, Watcher, EtcdError,
+    Etcd3, Watcher, EtcdError, IKeyValue, IWatchResponse,
 } from 'etcd3';
-import * as RPC from 'etcd3/lib/src/rpc';
 import EtcdService from './etcd.service';
 import { WatcherEntry } from '../../types';
 import store from '@/store';
@@ -52,7 +51,7 @@ export default class WatcherService extends EtcdService implements DataService {
 
     private handleEvent(event: string, outputType: number): any {
         if (event === 'put' || event === 'delete') {
-            return (kv: RPC.IKeyValue, previous?: RPC.IKeyValue) => {
+            return (kv: IKeyValue, previous?: IKeyValue) => {
                 const msg = this.getMessage(
                     event,
                     kv.key.toString(),
@@ -61,7 +60,7 @@ export default class WatcherService extends EtcdService implements DataService {
                 this.generateOutput(msg, outputType);
             };
         } if (event === 'connected') {
-            return (res: RPC.IWatchResponse) => {
+            return (res: IWatchResponse) => {
                 const msg = this.getMessage(
                     event,
                     res.watch_id);
@@ -84,8 +83,9 @@ export default class WatcherService extends EtcdService implements DataService {
         try {
             watcherStream = await this.createWatcher(watcher);
         } catch (e) {
-            Messages.error(e);
-            return Promise.reject(new Error(e));
+            const errorMessage = e instanceof Error ? e.message : String(e);
+            Messages.error(errorMessage);
+            return Promise.reject(new Error(errorMessage));
         }
 
         watcherStream = this.registerWatcherEvents(
