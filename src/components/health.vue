@@ -328,7 +328,7 @@ export default class HealthCheck extends Vue {
         header: {},
     };
     public health: {
-        [key: string]: IAlarmResponse;
+        [key: string]: IAlarmResponse | 'unreachable';
     } = {};
 
     public rowsPerPageItems = [4, 8, 12];
@@ -340,6 +340,7 @@ export default class HealthCheck extends Vue {
     public help: number | null = null;
     public platformService: PlatformService;
     public helpbar: any = 0;
+    private keyboardEvents: ReturnType<typeof Mousetrap> | null = null;
 
     constructor() {
         super();
@@ -348,34 +349,44 @@ export default class HealthCheck extends Vue {
     }
 
     created() {
-        const keyboardEvents = new Mousetrap();
-        keyboardEvents.bind(['ctrl+h', 'meta+h'], (e: ExtendedKeyboardEvent) => {
+        this.keyboardEvents = new Mousetrap();
+        this.keyboardEvents.bind(['ctrl+h', 'meta+h'], (e: ExtendedKeyboardEvent) => {
             e.preventDefault();
             this.help = this.help === null ? 0 : null;
         });
         this.fetchMembers();
     }
 
+    beforeDestroy() {
+        // Clean up keyboard events to prevent memory leaks
+        if (this.keyboardEvents) {
+            this.keyboardEvents.reset();
+            this.keyboardEvents = null;
+        }
+    }
+
     public getIcon(id: string) {
-        if (!this.health[id]) {
+        const healthStatus = this.health[id];
+        if (!healthStatus) {
             return 'remove';
         }
         // Check for unreachable state (#74)
-        if (this.health[id] === 'unreachable') {
+        if (healthStatus === 'unreachable') {
             return 'cloud_off';
         }
-        return this.health[id].alarms.length ? 'cancel' : 'check_circle';
+        return healthStatus.alarms.length ? 'cancel' : 'check_circle';
     }
 
     public getColor(id: string) {
-        if (!this.health[id]) {
+        const healthStatus = this.health[id];
+        if (!healthStatus) {
             return 'none';
         }
         // Check for unreachable state (#74)
-        if (this.health[id] === 'unreachable') {
+        if (healthStatus === 'unreachable') {
             return 'warning';
         }
-        return this.health[id].alarms.length ? 'error' : 'success';
+        return healthStatus.alarms.length ? 'error' : 'success';
     }
 
     async healthCheck(id: string) {
@@ -383,7 +394,7 @@ export default class HealthCheck extends Vue {
             this.health[id] = await this.etcd.getAlarms(id);
         } catch (e) {
             // Mark node as unreachable when health check fails (#74)
-            this.health[id] = 'unreachable' as any;
+            this.health[id] = 'unreachable';
         }
         this.fetchMembers();
     }

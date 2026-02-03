@@ -37,7 +37,8 @@ export default class EtcdService {
                 'grpc.max_receive_message_length': 100 * 1024 * 1024, // 100MB
                 'grpc.max_send_message_length': 100 * 1024 * 1024,    // 100MB
             };
-            const mergedOptions = {
+            const mergedOptions: IOptions = {
+                hosts: options?.hosts || 'localhost:2379',
                 ...options,
                 grpcOptions: { ...options?.grpcOptions, ...grpcOptions },
             };
