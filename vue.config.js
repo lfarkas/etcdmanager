@@ -3,6 +3,21 @@ module.exports = {
     runtimeCompiler: true,
     // Transpile cockatiel (etcd3 dependency) which uses modern JS syntax
     transpileDependencies: ['cockatiel'],
+    // Use modern Sass API to avoid deprecation warning
+    css: {
+        loaderOptions: {
+            sass: {
+                sassOptions: {
+                    silenceDeprecations: ['legacy-js-api'],
+                },
+            },
+            scss: {
+                sassOptions: {
+                    silenceDeprecations: ['legacy-js-api'],
+                },
+            },
+        },
+    },
     configureWebpack: {
         node: {
             __dirname: true,
