@@ -31,3 +31,9 @@ yarn-error.log*
 #Electron-builder output
 /dist_electron
 /default.etcd
+
+# Lock files
+package-lock.json
+
+# Claude Code local settings
+.claude/settings.local.json
