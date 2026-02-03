@@ -71,7 +71,12 @@ new Vue({
     },
     mounted() {
         console.log('[main.ts] Vue app mounted!');
-        this.$router.push('/');
+        // Only navigate if not already at root to avoid NavigationDuplicated error
+        if (this.$route.path !== '/') {
+            this.$router.push('/').catch(() => {
+                // Ignore NavigationDuplicated errors
+            });
+        }
       },
 }).$mount('#app');
 console.log('[main.ts] Vue $mount called');
