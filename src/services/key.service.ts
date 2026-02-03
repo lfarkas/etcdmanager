@@ -32,7 +32,8 @@ export default class KeyService extends EtcdService implements DataService {
         result.watcher.on('data', (res) => {
             res.events.forEach((event) => {
                 result.revisions.unshift({
-                    key: event.kv.value.toString(),
+                    key: event.kv.key.toString(),
+                    value: event.kv.value.toString(),
                     version: event.kv.version,
                     createRevision: event.kv.create_revision,
                     modRevision: event.kv.mod_revision,

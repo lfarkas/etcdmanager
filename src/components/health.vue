@@ -360,6 +360,10 @@ export default class HealthCheck extends Vue {
         if (!this.health[id]) {
             return 'remove';
         }
+        // Check for unreachable state (#74)
+        if (this.health[id] === 'unreachable') {
+            return 'cloud_off';
+        }
         return this.health[id].alarms.length ? 'cancel' : 'check_circle';
     }
 
@@ -367,11 +371,20 @@ export default class HealthCheck extends Vue {
         if (!this.health[id]) {
             return 'none';
         }
+        // Check for unreachable state (#74)
+        if (this.health[id] === 'unreachable') {
+            return 'warning';
+        }
         return this.health[id].alarms.length ? 'error' : 'success';
     }
 
     async healthCheck(id: string) {
-        this.health[id] = await this.etcd.getAlarms(id);
+        try {
+            this.health[id] = await this.etcd.getAlarms(id);
+        } catch (e) {
+            // Mark node as unreachable when health check fails (#74)
+            this.health[id] = 'unreachable' as any;
+        }
         this.fetchMembers();
     }
 

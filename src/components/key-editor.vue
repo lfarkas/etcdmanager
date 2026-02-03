@@ -207,10 +207,9 @@
                             </v-tooltip>
                         </v-text-field>
 
-                        <v-text-field
-                            data-test="key-editor.value.text-field"
+                        <v-textarea
+                            data-test="key-editor.value.textarea"
                             dark
-                            type="text"
                             v-model="value"
                             :error-messages="valueErrors"
                             :label="$t('keyEditor.fields.value.label')"
@@ -222,29 +221,52 @@
                                 clipboardService.copyToClipboard(value)
                             "
                             required
+                            auto-grow
+                            rows="3"
                             @input="$v.value.$touch()"
                             @blur="$v.value.$touch()"
                         >
-                            <v-tooltip
-                                data-test="key-editor.value.tooltip"
-                                slot="prepend"
-                                bottom
-                                max-width="200"
-                            >
-                                <v-icon
-                                    data-test="key-editor.value.icon"
-                                    slot="activator"
-                                    color="primary"
-                                    dark
-                                    >info</v-icon
+                            <template v-slot:prepend>
+                                <v-tooltip
+                                    data-test="key-editor.value.tooltip"
+                                    bottom
+                                    max-width="200"
                                 >
-                                <span data-test="key-editor.value.span"
-                                    >{{
-                                        $t('keyEditor.fields.value.tooltip')
-                                    }}.</span
+                                    <v-icon
+                                        data-test="key-editor.value.icon"
+                                        slot="activator"
+                                        color="primary"
+                                        dark
+                                        >info</v-icon
+                                    >
+                                    <span data-test="key-editor.value.span"
+                                        >{{
+                                            $t('keyEditor.fields.value.tooltip')
+                                        }}.</span
+                                    >
+                                </v-tooltip>
+                            </template>
+                            <template v-slot:append-outer>
+                                <v-tooltip
+                                    data-test="key-editor.format.tooltip"
+                                    bottom
+                                    max-width="200"
                                 >
-                            </v-tooltip>
-                        </v-text-field>
+                                    <v-btn
+                                        data-test="key-editor.format.button"
+                                        slot="activator"
+                                        icon
+                                        small
+                                        @click="formatValue"
+                                    >
+                                        <v-icon small color="primary">code</v-icon>
+                                    </v-btn>
+                                    <span data-test="key-editor.format.span">{{
+                                        $t('keyEditor.buttons.format')
+                                    }}</span>
+                                </v-tooltip>
+                            </template>
+                        </v-textarea>
 
                         <v-text-field
                             v-if="!editMode"
@@ -586,7 +608,19 @@ export default class KeyEditor extends BaseEditor {
     }
 
     public revertValue(item: any) {
-        this.value = item.key;
+        this.value = item.value;
+    }
+
+    public formatValue() {
+        if (!this.value) {
+            return;
+        }
+        try {
+            const parsed = JSON.parse(this.value);
+            this.value = JSON.stringify(parsed, null, 2);
+        } catch (e) {
+            // Not valid JSON, leave as is
+        }
     }
 
     public async submit(): Promise<KeyEditor | ValidationError> {

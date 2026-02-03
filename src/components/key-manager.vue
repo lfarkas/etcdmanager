@@ -127,13 +127,21 @@
                                 data-test="key-manager.help.spacer"
                             ></v-spacer>
                             <v-text-field
-                                data-test="key-manager.help.text-field"
+                                data-test="key-manager.key-filter.text-field"
                                 dark
                                 ref="search"
                                 color="white"
                                 v-model="filter"
                                 prepend-icon="search"
                                 :placeholder="$t('common.lists.filter')"
+                            ></v-text-field>
+                            <v-text-field
+                                data-test="key-manager.value-filter.text-field"
+                                dark
+                                color="white"
+                                v-model="valueFilter"
+                                prepend-icon="find_in_page"
+                                :placeholder="$t('keyManager.filters.valueFilter')"
                             ></v-text-field>
                             <v-tooltip
                                 data-test="key-manager.purgeAll.tooltip"
@@ -531,7 +539,7 @@
                     ref="table"
                     :search="filter"
                     :headers="headers"
-                    v-bind:items="data"
+                    v-bind:items="filteredData"
                     item-key="key"
                     select-all
                     v-model="selected"
@@ -705,6 +713,7 @@ import { required } from 'vuelidate/lib/validators';
 export default class KeyManager extends CrudBase implements List {
     public treeData = [];
     public separator: string = '';
+    public valueFilter: string = '';
 
     public headers = [
         {
@@ -734,6 +743,20 @@ export default class KeyManager extends CrudBase implements List {
         }
 
         return errors;
+    }
+
+    /**
+     * Filter data by value (#17)
+     * Returns data filtered by valueFilter if set
+     */
+    get filteredData() {
+        if (!this.valueFilter) {
+            return this.data;
+        }
+        const lowerFilter = this.valueFilter.toLowerCase();
+        return this.data.filter((item: any) =>
+            item.tooltip && item.tooltip.toLowerCase().includes(lowerFilter)
+        );
     }
 
     constructor() {
@@ -898,6 +921,19 @@ export default class KeyManager extends CrudBase implements List {
         return this.isTreeView() ? 'list' : 'zoom_in';
     }
 
+    /**
+     * Process escape sequences in a string (e.g., \n, \t, \0)
+     * Supports common escape sequences for key separators (#121, #128)
+     */
+    public processEscapeSequences(str: string): string {
+        return str
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t')
+            .replace(/\\0/g, '\0')
+            .replace(/\\r/g, '\r')
+            .replace(/\\\\/g, '\\');
+    }
+
     public loadTree() {
         if (!this.separator) {
             return;
@@ -911,8 +947,10 @@ export default class KeyManager extends CrudBase implements List {
         const tmp: TreeNodeType[] = [];
         const keyMap = {};
         let counter = 1;
+        // Process escape sequences in separator
+        const processedSeparator = this.processEscapeSequences(this.separator);
         for (const item of this.data) {
-            const keys = item.key.split(`${this.separator}`);
+            const keys = item.key.split(processedSeparator);
 
             for (let i = 0; i < keys.length; i += 1) {
                 const object: TreeNodeType = {};

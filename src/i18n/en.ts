@@ -372,6 +372,12 @@ export default {
                 check: 'Check member health',
                 status: 'Fetch status info',
             },
+            status: {
+                healthy: 'Healthy',
+                unhealthy: 'Unhealthy',
+                unreachable: 'Unreachable',
+                unknown: 'Unknown',
+            },
             dialogs: {
                 info: {
                     title: 'Info',
@@ -396,6 +402,7 @@ export default {
 
                 * Order the list by any column (click the **column title**).
                 * Filter the list by any column (use the **search box**).
+                * Filter by value content (use the **value filter box**).
                 * Delete selected keys (click **remove**).
                 * Delete all keys (click **purge**).
                 * Touch selected keys (click **touch**)
@@ -407,6 +414,9 @@ export default {
             columns: {
                 key: 'Key',
                 value: 'Value',
+            },
+            filters: {
+                valueFilter: 'Filter by value..',
             },
             actions: {
                 treeView: 'Tree',
@@ -453,6 +463,7 @@ export default {
             buttons: {
                 revisions: 'Show revisions',
                 revisionsHide: 'Hide revisions',
+                format: 'Format JSON',
             },
             messages: {
                 duplicateKey: 'This key already exists!',

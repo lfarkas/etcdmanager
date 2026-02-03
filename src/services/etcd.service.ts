@@ -31,7 +31,17 @@ export default class EtcdService {
             this.client.close();
         }
         try {
-            this.client = new Etcd3(options);
+            // Increase gRPC message size limits to handle large datasets
+            // Default is 4MB which causes RESOURCE_EXHAUSTED errors (#123, #80, #78)
+            const grpcOptions = {
+                'grpc.max_receive_message_length': 100 * 1024 * 1024, // 100MB
+                'grpc.max_send_message_length': 100 * 1024 * 1024,    // 100MB
+            };
+            const mergedOptions = {
+                ...options,
+                grpcOptions: { ...options?.grpcOptions, ...grpcOptions },
+            };
+            this.client = new Etcd3(mergedOptions);
         } catch (e) {
             throw e;
         }
