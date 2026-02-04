@@ -550,7 +550,6 @@
                                     <v-container v-if="ssl_enabled">
                                         <v-layout align-end row>
                                             <v-text-field
-                                                readonly
                                                 data-test="config.etcd-fields-certificate.text-field"
                                                 dark
                                                 ref="certificate"
@@ -630,7 +629,6 @@
                                         </v-layout>
                                         <v-layout align-end row>
                                             <v-text-field
-                                                readonly
                                                 data-test="config.etcd-fields-certKey.text-field"
                                                 dark
                                                 ref="certKey"
@@ -707,7 +705,6 @@
                                         </v-layout>
                                         <v-layout align-end row>
                                             <v-text-field
-                                                readonly
                                                 data-test="config.etcd-fields-certChain.text-field"
                                                 dark
                                                 ref="certChain"
