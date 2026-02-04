@@ -21,11 +21,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --ignore-engines
 
       - name: Build Linux
         run: yarn electron:build:linux
@@ -49,11 +49,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --ignore-engines
 
       - name: Build Windows
         run: yarn electron:build:win
@@ -75,11 +75,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --ignore-engines
 
       - name: Build macOS
         run: yarn electron:build:mac
