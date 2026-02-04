@@ -119,8 +119,8 @@
                         <h2 data-test="about.subheading-contributors.h2" class="subheading">Contributors</h2>
                         <v-list dense>
                             <v-list-tile
-                                v-for="(contributor, index) of getContributors()"
-                                :key="index"
+                                v-for="contributor of getContributors()"
+                                :key="contributor.name"
                             >
                                 <v-list-tile-content data-test="about.contributor.list-tile-content" class="align-end">{{ contributor.name }}</v-list-tile-content>
                                 <v-list-tile-action>

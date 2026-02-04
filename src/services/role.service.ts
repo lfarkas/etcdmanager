@@ -17,10 +17,6 @@ export default class RoleService extends EtcdService implements DataService {
         return this.client.role(name);
     }
 
-    public async loadRole(name: string) {
-        return this.client.role(name);
-    }
-
     public getRoles(): Promise<Role[]> {
         return this.client.getRoles();
     }
@@ -42,11 +38,9 @@ export default class RoleService extends EtcdService implements DataService {
     public async purge(): Promise<any> {
         try {
             const roles = await this.getRoles();
-            const promises: Promise<Role>[] = [];
-            roles.forEach((role) => {
-                promises.push(this.remove([role.name]));
-            });
-            return Promise.all(promises);
+            // Batch all role names and remove in a single call for efficiency
+            const roleNames = roles.map((role) => role.name);
+            return this.remove(roleNames);
         } catch (e) {
             return Promise.reject(e);
         }

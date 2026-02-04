@@ -26,17 +26,17 @@ yarn electron:build:mac          # macOS (DMG)
 yarn electron:build:win          # Windows (NSIS installer)
 
 # Linting
-yarn lint                # Run TSLint on TypeScript files
+yarn lint                # Run ESLint on TypeScript files
 
 # Testing
-yarn test                # Run Mocha/Spectron e2e tests (test/spec/)
+yarn test                # Tests disabled - migrate to Playwright
 ```
 
 ## Architecture
 
 ### Technology Stack
-- **Desktop**: Electron 6
-- **Frontend**: Vue.js 2.6 with Vuetify 1.5 (Material Design)
+- **Desktop**: Electron 34
+- **Frontend**: Vue.js 2.7 with Vuetify 1.5 (Material Design)
 - **State**: Vuex for global state management
 - **ETCD Client**: etcd3 library with gRPC
 
@@ -83,20 +83,13 @@ Routes like `/keys`, `/users`, `/roles`, `/cluster`, `/watchers` are protected b
 ## Code Style
 
 - **TypeScript**: Strict mode enabled
-- **Linter**: TSLint with AirBnB config
+- **Linter**: ESLint with TypeScript and Vue plugins
 - **Formatting**: Prettier (4-space indent, single quotes, trailing commas)
 - **Max line length**: 140 characters
 
 ## Testing
 
-Tests use Mocha + Chai + Spectron for e2e testing of the Electron app.
-
-```
-test/
-├── spec/                # Test files
-├── pageobjects/         # Spectron page objects
-└── shared/              # Shared utilities
-```
+Tests are currently disabled and pending migration to Playwright.
 
 **UI Test Selectors**: All testable UI elements must have `data-test` attributes with the naming convention: `componentName-operation-elementType` (e.g., `data-test="config.settings-actions-submit.v-btn"`).
 
@@ -104,8 +97,8 @@ test/
 
 - `vue.config.js` - Vue CLI config with Electron Builder settings
 - `tsconfig.json` - TypeScript compiler options (strict mode, ESNext target)
-- `tslint.json` - Linting rules (AirBnB-based)
-- `.huskyrc.js` - Pre-commit/pre-push hooks run `yarn lint`
+- `.eslintrc.js` - ESLint configuration with TypeScript and Vue plugins
+- `.husky/` - Pre-commit/pre-push hooks run `npm run lint`
 
 ## Internationalization
 

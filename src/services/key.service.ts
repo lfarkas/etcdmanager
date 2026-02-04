@@ -63,13 +63,15 @@ export default class KeyService extends EtcdService implements DataService {
                 let query: MultiRangeBuilder | DeleteBuilder;
                 if (isPut) {
                     query = this.client.getAll();
-                    if (permission.permission.includes('Read')) {
+                    // Use lowercase for consistent permission checking
+                    if (permission.permission.toLowerCase().includes('read')) {
                         query.inRange(permission.range);
                         queries.push((query as MultiRangeBuilder).strings());
                     }
                 } else {
                     query = this.client.delete();
-                    if (permission.permission.includes('write')) {
+                    // Use lowercase for consistent permission checking
+                    if (permission.permission.toLowerCase().includes('write')) {
                         query.inRange(permission.range);
                         // @ts-ignore
                         queries.push(query);

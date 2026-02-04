@@ -28,4 +28,8 @@ export class LocalStorageService {
         return this;
     }
 
+    public remove(key: string): LocalStorageService {
+        this.ls.remove(key);
+        return this;
+    }
 }

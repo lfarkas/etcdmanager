@@ -29,7 +29,8 @@ export class AuthService {
 
     public async hasRole(roleName: string): Promise<boolean> {
         if (!this.isAuthenticated()) {
-            return true;
+            // Unauthenticated users should not have any roles - return false for security
+            return false;
         }
         if (!this.client) {
             this.client = this.updateClient();

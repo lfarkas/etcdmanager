@@ -1,14 +1,9 @@
-console.log('[main.ts] Starting Vue app initialization...');
 import { ValidationError } from './lib/validation-error.class';
 import Vue from 'vue';
-console.log('[main.ts] Vue imported');
 import App from './components/app.vue';
-console.log('[main.ts] App component imported');
 import router from './router';
-console.log('[main.ts] Router imported');
 import store from './store';
-console.log('[main.ts] Store imported');
-const vueLocalStorage = require('vue-localstorage');
+import vueLocalStorage from 'vue-localstorage';
 import Vuetify from 'vuetify';
 import 'vuetify/dist/vuetify.min.css';
 import Vuelidate from 'vuelidate';
@@ -58,19 +53,16 @@ Vue.config.errorHandler = function (err: any, vm: Vue, info: any) {
     }
 };
 
-console.log('[main.ts] Creating Vue instance...');
 new Vue({
     i18n,
     router,
     store,
     validations: {},
     render: (h) => {
-        console.log('[main.ts] Rendering App component');
         //  @ts-ignore
         return h(App);
     },
     mounted() {
-        console.log('[main.ts] Vue app mounted!');
         // Only navigate if not already at root to avoid NavigationDuplicated error
         if (this.$route.path !== '/') {
             this.$router.push('/').catch(() => {
@@ -79,4 +71,3 @@ new Vue({
         }
       },
 }).$mount('#app');
-console.log('[main.ts] Vue $mount called');

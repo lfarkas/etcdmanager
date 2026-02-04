@@ -7,14 +7,15 @@ import { i18n, loadedLang } from './main';
 import { join } from 'path';
 import VueI18n from 'vue-i18n';
 import { CurrentProfileType } from '../types';
-const { ipcRenderer } = require('electron');
+import { ipcRenderer } from 'electron';
+import * as remote from '@electron/remote';
 
 // Lazy-load @electron/remote to avoid initialization timing issues
 let remoteApp: Electron.App | null = null;
 function getRemoteApp(): Electron.App {
     if (!remoteApp) {
         try {
-            remoteApp = require('@electron/remote').app;
+            remoteApp = remote.app;
         } catch (e) {
             console.error('Failed to load @electron/remote:', e);
             throw e;

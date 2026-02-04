@@ -294,7 +294,7 @@ class UserEditorError extends Error {
 
 @Component({
     // @ts-ignore
-    name: 'key-editor',
+    name: 'user-editor',
     validations: {
         name: {
             required,

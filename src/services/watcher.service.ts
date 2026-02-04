@@ -22,13 +22,13 @@ export default class WatcherService extends EtcdService implements DataService {
             case 'delete':
                 return `${date} The key "${args[0]}" has been deleted.`;
             case 'connected':
-                return `${date} The watcher ${args[0]} has been successfully reconnected!""`;
+                return `${date} The watcher ${args[0]} has been successfully reconnected!`;
             case 'end':
-                return `${date} A watcher has been closed!""`;
+                return `${date} A watcher has been closed!`;
             case 'disconnected':
-                return `${date} A watcher has been disconnected. Error: ${args[0]}""`;
+                return `${date} A watcher has been disconnected. Error: ${args[0]}`;
             case 'error':
-                return `${date} Error: ${args[0]}""`;
+                return `${date} Error: ${args[0]}`;
         }
         return '';
     }
