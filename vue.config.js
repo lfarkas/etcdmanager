@@ -128,8 +128,6 @@ module.exports = {
                 dmg: {
                     background: './build_files/icon_gray.png',
                     title: '${productName} v${version}',
-                    // Disable license to avoid dmg-license language detection issues on CI
-                    license: null,
                     contents: [
                         {
                             x: 150,
