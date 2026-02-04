@@ -80,14 +80,16 @@
     "Tamas Geschitz <getamas@gmail.com>",
     "Jozsef Szalai",
     "David Onofer",
-    "Gabor Nagy"
+    "Gabor Nagy",
+    "Levente Farkas <lfarkas@lfarkas.org>"
   ],
   "contributors": [
     "Tamas Geschitz <getamas@gmail.com>",
     "Jozsef Szalai",
     "David Onofer",
     "Daniel Rudolf",
-    "Gabor Nagy"
+    "Gabor Nagy",
+    "Levente Farkas <lfarkas@lfarkas.org>"
   ],
   "engines": {
     "node": ">= 18.0.0"
