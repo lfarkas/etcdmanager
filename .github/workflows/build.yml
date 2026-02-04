@@ -82,7 +82,7 @@ jobs:
         run: yarn install --ignore-engines
 
       - name: Build macOS
-        run: yarn electron:build:mac
+        run: yarn vue-cli-service electron:build --macos zip --x64
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -90,7 +90,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: macos-builds
-          path: dist_electron/*.dmg
+          path: dist_electron/*.zip
 
   release:
     needs: [build-linux, build-windows, build-macos]
