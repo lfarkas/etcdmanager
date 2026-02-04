@@ -1,0 +1,97 @@
+module.exports = {
+    root: true,
+    env: {
+        node: true,
+        browser: true,
+        es2021: true,
+    },
+    parser: 'vue-eslint-parser',
+    parserOptions: {
+        parser: '@typescript-eslint/parser',
+        ecmaVersion: 2021,
+        sourceType: 'module',
+        project: './tsconfig.json',
+        extraFileExtensions: ['.vue'],
+    },
+    extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:vue/recommended',
+        'prettier',
+    ],
+    plugins: ['@typescript-eslint', 'vue'],
+    rules: {
+        // TypeScript specific rules (migrated from TSLint)
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        '@typescript-eslint/no-inferrable-types': 'off',
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/explicit-member-accessibility': 'off',
+        '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+        '@typescript-eslint/no-empty-function': 'off',
+        '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/ban-types': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
+
+        // General ESLint rules (migrated from TSLint)
+        'arrow-body-style': 'off',
+        'curly': 'off',
+        'eol-last': 'warn',
+        'eqeqeq': ['warn', 'smart'],
+        'guard-for-in': 'warn',
+        'max-len': 'off',
+        'no-bitwise': 'off',
+        'no-console': 'off',
+        'no-debugger': 'warn',
+        'no-eval': 'error',
+        'no-new-wrappers': 'warn',
+        'no-throw-literal': 'warn',
+        'no-trailing-spaces': 'warn',
+        'no-var': 'error',
+        'prefer-const': 'warn',
+        'quotes': 'off',
+        'radix': 'warn',
+        'semi': 'off',
+
+        // Vue specific rules
+        'vue/html-indent': 'off',
+        'vue/script-indent': 'off',
+        'vue/max-attributes-per-line': 'off',
+        'vue/singleline-html-element-content-newline': 'off',
+        'vue/multi-word-component-names': 'off',
+        'vue/no-v-html': 'off',
+        'vue/require-default-prop': 'off',
+        'vue/html-self-closing': 'off',
+        'vue/attributes-order': 'off',
+        'vue/v-slot-style': 'off',
+        'vue/v-on-style': 'off',
+        'vue/v-bind-style': 'off',
+        'vue/component-tags-order': 'off',
+        'vue/this-in-template': 'off',
+        'vue/attribute-hyphenation': 'off',
+        'vue/valid-v-slot': 'off',
+        'vue/component-definition-name-casing': 'off',
+        'vue/order-in-components': 'off',
+        'vue/no-v-text-v-html-on-component': 'off',
+
+        // Disabled rules that conflict with existing code style
+        'no-empty': 'off',
+        '@typescript-eslint/no-empty-interface': 'off',
+        'no-undef': 'off',
+        'no-sparse-arrays': 'off',
+        'no-useless-catch': 'off',
+    },
+    overrides: [
+        {
+            files: ['*.vue'],
+            rules: {
+                'max-len': 'off', // Vue templates often exceed line length
+            },
+        },
+    ],
+    ignorePatterns: [
+        'node_modules/',
+        'dist/',
+        'dist_electron/',
+        '*.d.ts',
+    ],
+};

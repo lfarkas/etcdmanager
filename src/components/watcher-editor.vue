@@ -409,7 +409,7 @@ import { BaseEditor } from '../lib/editor.class';
 import WatcherService from '../services/watcher.service';
 import { Prop } from 'vue-property-decorator';
 import ActionEditor from './action-editor.vue';
-import uuidv1 from 'uuid/v1';
+import { v1 as uuidv1 } from 'uuid';
 
 @Component({
     name: 'watcher-editor',

@@ -22,7 +22,7 @@ import { readFileSync } from 'fs';
 import { get } from 'lodash-es';
 import * as defaultTranslations from './i18n/en';
 import { autoUpdater } from 'electron-updater';
-import marked from 'marked';
+import { marked } from 'marked';
 import { initialize as initializeRemote, enable as enableRemote } from '@electron/remote/main';
 
 const pkg = JSON.parse(
@@ -58,7 +58,7 @@ protocol.registerSchemesAsPrivileged([
 
 function loadWhatsNew() {
     const news = readFileSync(`${__static}/WHATSNEW.md`).toString();
-    win.webContents.send('whatsnew-data', marked(news));
+    win.webContents.send('whatsnew-data', marked.parse(news));
 }
 
 function createAppMenu(translations: any, disabledMap: GenericObject = {}) {

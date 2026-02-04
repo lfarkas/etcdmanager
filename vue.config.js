@@ -1,8 +1,12 @@
 module.exports = {
     assetsDir: 'assets',
     runtimeCompiler: true,
-    // Transpile cockatiel (etcd3 dependency) which uses modern JS syntax
-    transpileDependencies: ['cockatiel'],
+    // Transpile dependencies that use modern JS syntax
+    transpileDependencies: ['cockatiel', 'uuid', 'marked'],
+    // Disable fork-ts-checker-webpack-plugin (incompatible with TS5)
+    chainWebpack: (config) => {
+        config.plugins.delete('fork-ts-checker');
+    },
     // Use modern Sass API to avoid deprecation warning
     css: {
         loaderOptions: {
@@ -58,6 +62,19 @@ module.exports = {
     pluginOptions: {
         nodeModulesPath: ['../../node_modules', './node_modules'],
         electronBuilder: {
+            // Transpile marked in main process
+            chainWebpackMainProcess: (config) => {
+                config.module
+                    .rule('babel')
+                    .test(/\.js$/)
+                    .include.add(/node_modules[\\/]marked/)
+                    .end()
+                    .use('babel-loader')
+                    .loader('babel-loader')
+                    .options({
+                        presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+                    });
+            },
             // Node.js modules used by @grpc/grpc-js need to be externalized
             // @electron/remote must also be externalized for renderer process
             externals: ['dns', 'http2', 'tls', 'net', 'fs', 'path', '@electron/remote'],

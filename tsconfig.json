@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
+    "target": "ES2022",
+    "module": "ESNext",
     "strict": true,
     "skipLibCheck": true,
     "jsx": "preserve",
@@ -21,6 +21,8 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "useDefineForClassFields": false,
+    "verbatimModuleSyntax": false,
 
     "baseUrl": ".",
     "types": [
@@ -35,10 +37,9 @@
       ]
     },
     "lib": [
-      "esnext",
+      "ES2022",
       "dom",
-      "dom.iterable",
-      "scripthost"
+      "dom.iterable"
     ]
   },
   "include": [
