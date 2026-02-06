@@ -246,7 +246,7 @@ export default class LeaseEditor extends BaseEditor {
     public id: string = '';
 
     created() {
-        this.id = this.data?.ID || '';
+        this.id = this.data?.hexID || this.data?.ID || '';
     }
 
     public keys: GenericObject[] = [];

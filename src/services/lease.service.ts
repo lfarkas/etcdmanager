@@ -10,10 +10,18 @@ export default class LeaseService extends EtcdService {
         super(client);
     }
 
+    public static toHexId(id: string | number): string {
+        try {
+            return BigInt(id).toString(16);
+        } catch {
+            return String(id);
+        }
+    }
+
     public async getLeases(): Promise<GenericObject[]> {
         const res = await this.client.leaseClient.leaseLeases();
         return res.leases.map((lease: any) => {
-            return { ID: lease.ID }
+            return { ID: lease.ID, hexID: LeaseService.toHexId(lease.ID) }
         });
     }
 

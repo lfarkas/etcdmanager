@@ -325,7 +325,7 @@
                                 hide-details
                             ></v-checkbox>
                         </td>
-                        <td>{{ props.item.ID }}</td>
+                        <td>{{ props.item.hexID }}</td>
                         <td
                             data-test="lease-manager.actions.td"
                             class="justify-center layout px-0"
@@ -442,7 +442,7 @@ export default class LeaseManager extends CrudBase implements List {
     }
 
     public async created() {
-        this.defaultItem = { ID: '' };
+        this.defaultItem = { ID: '', hexID: '' };
         this.translateHeaders('leaseManager.columns.id');
 
         const loader = () => {
