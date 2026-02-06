@@ -43,12 +43,12 @@ export class CrudBase extends Vue implements List {
         this.bindDefaultEvents();
     }
 
-    protected async addReloader(action: (data: any) => void) {
+    protected async addReloader(action: (data: any) => void, watchPrefix: string = '') {
         const client = this.etcd.getClient();
         if (client) {
             this.reloader = await client
                 .watch()
-                .prefix('')
+                .prefix(watchPrefix)
                 .create();
 
             this.reloader.on('data', action);
@@ -158,7 +158,7 @@ export class CrudBase extends Vue implements List {
         this.purgeDialog = true;
     }
 
-    public async confirmPurge(): Promise<CrudBase | Error> {
+    public async confirmPurge(): Promise<CrudBase> {
         try {
             this.toggleLoading();
             // @ts-ignore
@@ -167,15 +167,15 @@ export class CrudBase extends Vue implements List {
             await this.closeEditor();
             this.toggleLoading();
             this.purgeDialog = false;
-            return Promise.resolve(this);
+            return this;
         } catch (error) {
             this.toggleLoading();
             this.purgeDialog = false;
-            return Promise.reject(error);
+            throw error;
         }
     }
 
-    public async confirmDelete(keyName: string): Promise<CrudBase | Error> {
+    public async confirmDelete(keyName: string): Promise<CrudBase> {
         const item = this.itemToDelete as GenericObject;
         const toBeRemoved = this.hasSelection()
             ? this.getSelectedKeys(keyName)
@@ -194,11 +194,11 @@ export class CrudBase extends Vue implements List {
                 this.selected = [];
             }
             this.cancelDelete();
-            return Promise.resolve(this);
+            return this;
         } catch (error) {
             this.toggleLoading();
             this.cancelDelete();
-            return Promise.reject(error);
+            throw error;
         }
     }
 

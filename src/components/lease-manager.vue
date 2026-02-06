@@ -423,7 +423,6 @@ import LeaseEditor from './lease-editor.vue';
     },
 })
 export default class LeaseManager extends CrudBase implements List {
-    public none = 0;
     public headers = [
         {
             text: '',

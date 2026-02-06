@@ -43,9 +43,9 @@ export default class UserService extends EtcdService implements DataService {
             const userNames = userObjs.map((user: User) => {
                 return user.name;
             });
-            return Promise.resolve(this.remove(userNames));
+            return this.remove(userNames);
         } catch (error) {
-            return Promise.reject([error]);
+            throw error instanceof Error ? error : new Error(String(error));
         }
     }
 

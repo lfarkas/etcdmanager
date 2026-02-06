@@ -49,10 +49,10 @@ export class ConfigService {
         return [];
     }
 
-    public loadProfile(profile: string): ConfigService {
+    public async loadProfile(profile: string): Promise<ConfigService> {
         const oldCfg = this.getProfile(profile);
         if (oldCfg) {
-            this.replaceConfigState(oldCfg);
+            await this.replaceConfigState(oldCfg);
         } else {
             console.warn(`Profile "${profile}" not found`);
         }
@@ -172,7 +172,7 @@ export class ConfigService {
         if (authService.isAuthenticated()) {
             isRoot = await authService.isRoot();
         }
-        store.commit('limited', isRoot);
+        store.commit('limited', !isRoot);
         store.commit('updateCurrentProfile', config);
         ipcRenderer.send('update-menu', undefined, { manage: isRoot });
 

@@ -60,7 +60,7 @@
                                     <v-flex xs8>
                                         <p
                                             data-test="role-editor.common-help-shortcuts-save.p"
-                                            lass="label"
+                                            class="label"
                                         >{{ $t("common.help.shortcuts.save") }}</p>
                                     </v-flex>
                                 </v-layout>

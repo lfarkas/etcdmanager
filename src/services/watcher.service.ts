@@ -34,18 +34,19 @@ export default class WatcherService extends EtcdService implements DataService {
     }
 
     private generateOutput(message: string, outputType: number) {
-        if (outputType === 0) {
-            return store.commit('console', message);
-        } if (outputType === 1) {
-            return store.commit('message', Messages.message(message as string));
-        } if (outputType === 2) {
-            return new Notification('Attention!', {
-                lang: 'en',
-                timestamp: Date.now(),
-                body: message,
-                requireInteraction: true,
-                icon: './assets/etcd-glyph-color.png',
-            });
+        switch (outputType) {
+            case 0:
+                return store.commit('console', message);
+            case 1:
+                return store.commit('message', Messages.message(message as string));
+            case 2:
+                return new Notification('Attention!', {
+                    lang: 'en',
+                    timestamp: Date.now(),
+                    body: message,
+                    requireInteraction: true,
+                    icon: './assets/etcd-glyph-color.png',
+                });
         }
     }
 
@@ -85,7 +86,7 @@ export default class WatcherService extends EtcdService implements DataService {
         } catch (e) {
             const errorMessage = e instanceof Error ? e.message : String(e);
             Messages.error(errorMessage);
-            return Promise.reject(new Error(errorMessage));
+            throw new Error(errorMessage);
         }
 
         watcherStream = this.registerWatcherEvents(
@@ -98,7 +99,7 @@ export default class WatcherService extends EtcdService implements DataService {
             op: 'set',
         });
         watcher.activated = true;
-        return Promise.resolve(this);
+        return this;
     }
 
     public listWatchers(): WatcherEntry[] {
@@ -139,8 +140,9 @@ export default class WatcherService extends EtcdService implements DataService {
 
         if (watcher.prefix) {
             watcherBuilder = watcherBuilder.prefix(watcher.key).withPreviousKV();
+        } else {
+            watcherBuilder = watcherBuilder.key(watcher.key).withPreviousKV();
         }
-        watcherBuilder = watcherBuilder.key(watcher.key).withPreviousKV();
 
         return watcherBuilder.create();
     }

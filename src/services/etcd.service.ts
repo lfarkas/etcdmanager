@@ -4,7 +4,7 @@ import {
 } from 'etcd3';
 
 export default class EtcdService {
-    protected client: any = null;
+    protected client: Etcd3 | null = null;
 
     constructor(client?: Etcd3) {
         if (client) {
@@ -12,7 +12,7 @@ export default class EtcdService {
         }
     }
 
-    public getClient(): Etcd3 {
+    public getClient(): Etcd3 | null {
         return this.client;
     }
 
@@ -26,26 +26,22 @@ export default class EtcdService {
         }
     }
 
-    public init(options?: IOptions): EtcdService | string {
+    public init(options?: IOptions): EtcdService {
         if (this.client) {
             this.client.close();
         }
-        try {
-            // Increase gRPC message size limits to handle large datasets
-            // Default is 4MB which causes RESOURCE_EXHAUSTED errors (#123, #80, #78)
-            const grpcOptions = {
-                'grpc.max_receive_message_length': 100 * 1024 * 1024, // 100MB
-                'grpc.max_send_message_length': 100 * 1024 * 1024,    // 100MB
-            };
-            const mergedOptions: IOptions = {
-                hosts: options?.hosts || 'localhost:2379',
-                ...options,
-                grpcOptions: { ...options?.grpcOptions, ...grpcOptions },
-            };
-            this.client = new Etcd3(mergedOptions);
-        } catch (e) {
-            throw e;
-        }
+        // Increase gRPC message size limits to handle large datasets
+        // Default is 4MB which causes RESOURCE_EXHAUSTED errors (#123, #80, #78)
+        const grpcOptions = {
+            'grpc.max_receive_message_length': 100 * 1024 * 1024, // 100MB
+            'grpc.max_send_message_length': 100 * 1024 * 1024,    // 100MB
+        };
+        const mergedOptions: IOptions = {
+            hosts: options?.hosts || 'localhost:2379',
+            ...options,
+            grpcOptions: { ...options?.grpcOptions, ...grpcOptions },
+        };
+        this.client = new Etcd3(mergedOptions);
 
         return this;
     }

@@ -105,8 +105,8 @@ export default new Vuex.Store({
         separator(state, payload) {
             state.separator = payload;
         },
-        loading(state) {
-            state.loading = !state.loading;
+        loading(state, payload?: boolean) {
+            state.loading = payload !== undefined ? payload : !state.loading;
         },
         config(state, payload) {
             state.config = { ...state.config, ...payload };
@@ -158,11 +158,7 @@ export default new Vuex.Store({
         package(state) {
             state.package = JSON.parse(
                 readFileSync(
-                    join(
-                        process.platform !== 'win32' ? '/' : '',
-                        getRemoteApp().getAppPath(),
-                        'package.json'
-                    )
+                    join(getRemoteApp().getAppPath(), 'package.json')
                 ).toString()
             );
         },
@@ -196,16 +192,19 @@ export default new Vuex.Store({
             const lang = payload;
             if (i18n.locale !== lang) {
                 if (!loadedLang.includes(lang)) {
-                    const translations = await import(`@/i18n/${lang}`);
-                    i18n.setLocaleMessage(lang, translations.default[lang]);
-                    loadedLang.push(lang);
-                    context.commit('config', { language: lang });
+                    try {
+                        const translations = await import(`@/i18n/${lang}`);
+                        i18n.setLocaleMessage(lang, translations.default[lang]);
+                        loadedLang.push(lang);
+                        context.commit('config', { language: lang });
+                    } catch (e) {
+                        console.error(`Failed to load locale "${lang}":`, e);
+                        return i18n.locale;
+                    }
                 }
-                return Promise.resolve(
-                    setLanguage(lang, i18n.getLocaleMessage(lang))
-                );
+                return setLanguage(lang, i18n.getLocaleMessage(lang));
             }
-            return Promise.resolve(lang);
+            return lang;
         },
     },
 });

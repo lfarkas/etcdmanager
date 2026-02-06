@@ -64,6 +64,7 @@ export default {
             manageWatchers: 'Figyelők menedzselése',
             manageUsers: 'Felhasználók menedzselése',
             manageRoles: 'Szerepek menedzselése',
+            manageLeases: 'Lease-ek menedzselése',
             about: 'Az alkalmazásról',
         },
         app: {
@@ -71,7 +72,7 @@ export default {
         },
         common: {
             help: {
-                tooltip: 'Mutassa a segtítség panelt',
+                tooltip: 'Mutassa a segítség panelt',
                 infoTitle: `Tudta?`,
                 tabs: {
                     info: 'Info',
@@ -375,6 +376,12 @@ export default {
                 check: 'Tag állapot ellenőrzés',
                 status: 'Státusz infó lekérés',
             },
+            status: {
+                healthy: 'Egészséges',
+                unhealthy: 'Nem egészséges',
+                unreachable: 'Nem elérhető',
+                unknown: 'Ismeretlen',
+            },
             dialogs: {
                 info: {
                     title: 'Info',
@@ -410,6 +417,9 @@ export default {
             columns: {
                 key: 'Kulcs',
                 value: 'Érték',
+            },
+            filters: {
+                valueFilter: 'Szűrés érték alapján..',
             },
             actions: {
                 treeView: 'Fa',
@@ -455,6 +465,7 @@ export default {
             buttons: {
                 revisions: 'Revíziók',
                 revisionsHide: 'Revíziók off',
+                format: 'JSON formázás',
             },
             messages: {
                 duplicateKey: 'Ez a kulcs már létezik!',
@@ -635,6 +646,7 @@ export default {
             },
         },
         leaseEditor: {
+            title: 'Megtekintés',
             subtitle: 'Kulcsok melyek ehhez a lease-hez tartoznak',
             help: {
                 text: `Itt **megtekintheti** egy lease részleteit.

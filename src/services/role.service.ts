@@ -36,14 +36,9 @@ export default class RoleService extends EtcdService implements DataService {
     }
 
     public async purge(): Promise<any> {
-        try {
-            const roles = await this.getRoles();
-            // Batch all role names and remove in a single call for efficiency
-            const roleNames = roles.map((role) => role.name);
-            return this.remove(roleNames);
-        } catch (e) {
-            return Promise.reject(e);
-        }
+        const roles = await this.getRoles();
+        const roleNames = roles.map((role) => role.name);
+        return this.remove(roleNames);
     }
 
     public rolePermissions(name: string): Promise<IPermissionResult[]> {
@@ -79,7 +74,7 @@ export default class RoleService extends EtcdService implements DataService {
                 for (const perm of perms) {
                     const key = perm.range.start.toString();
                     if (key === options.key) {
-                        return Promise.reject(false);
+                        throw new Error('A permission is already associated with this key');
                     }
                 }
             }

@@ -334,7 +334,6 @@ import RoleEditor from './role-editor.vue';
     },
 })
 export default class RoleManager extends CrudBase implements List {
-    public none = 0;
     public headers = [
         {
             text: '',

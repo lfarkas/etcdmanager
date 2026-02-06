@@ -117,7 +117,7 @@ export default class ActionEditor extends BaseEditor {
     public actions: GenericObject[] = [
         { name: 'Print to console', value: 0, type: 1 },
         { name: 'Notification', value: 1, type: 1 },
-        { name: 'Desktop notofication', value: 2, type: 1 },
+        { name: 'Desktop notification', value: 2, type: 1 },
     ];
 
     public events: GenericObject[] = [

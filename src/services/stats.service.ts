@@ -15,7 +15,6 @@ export default class StatsService extends EtcdService {
         return this.client.maintenance.alarm({
             memberID,
             action: AlarmAction.Get,
-            // tslint:disable-next-line: no-bitwise
             alarm: AlarmType.Corrupt | AlarmType.Nospace,
         });
     }

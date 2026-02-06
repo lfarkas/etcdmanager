@@ -28,7 +28,7 @@ module.exports = {
         '@typescript-eslint/explicit-member-accessibility': 'off',
         '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
         '@typescript-eslint/no-empty-function': 'off',
-        '@typescript-eslint/ban-ts-comment': 'off',
+        '@typescript-eslint/ban-ts-comment': 'warn',
         '@typescript-eslint/ban-types': 'off',
         '@typescript-eslint/no-var-requires': 'off',
 
@@ -40,7 +40,7 @@ module.exports = {
         'guard-for-in': 'warn',
         'max-len': 'off',
         'no-bitwise': 'off',
-        'no-console': 'off',
+        'no-console': 'warn',
         'no-debugger': 'warn',
         'no-eval': 'error',
         'no-new-wrappers': 'warn',
@@ -58,7 +58,7 @@ module.exports = {
         'vue/max-attributes-per-line': 'off',
         'vue/singleline-html-element-content-newline': 'off',
         'vue/multi-word-component-names': 'off',
-        'vue/no-v-html': 'off',
+        'vue/no-v-html': 'warn',
         'vue/require-default-prop': 'off',
         'vue/html-self-closing': 'off',
         'vue/attributes-order': 'off',
@@ -78,7 +78,7 @@ module.exports = {
         '@typescript-eslint/no-empty-interface': 'off',
         'no-undef': 'off',
         'no-sparse-arrays': 'off',
-        'no-useless-catch': 'off',
+        'no-useless-catch': 'warn',
     },
     overrides: [
         {

@@ -14,7 +14,6 @@ import {
 } from 'electron';
 import {
     createProtocol,
-    installVueDevtools,
 } from 'vue-cli-plugin-electron-builder/lib';
 import * as Splashscreen from '@trodi/electron-splashscreen';
 import { join } from 'path';
@@ -27,11 +26,7 @@ import { initialize as initializeRemote, enable as enableRemote } from '@electro
 
 const pkg = JSON.parse(
     readFileSync(
-        join(
-            process.platform !== 'win32' ? '/' : '',
-            app.getAppPath(),
-            'package.json'
-        )
+        join(app.getAppPath(), 'package.json')
     ).toString()
 );
 const isDevelopment = process.env.NODE_ENV !== 'production';
@@ -63,13 +58,11 @@ function loadWhatsNew() {
 
 function createAppMenu(translations: any, disabledMap: GenericObject = {}) {
     const menuRouter = (where: string) => {
-        // tslint:disable-next-line: variable-name
         return (_menuItem: any, window: BrowserWindow) => {
             window.webContents.send('navigate', where);
         };
     };
 
-    // tslint:disable-next-line: no-parameter-reassignment
     translations = translations || defaultTranslations.default.en;
 
     const template: MenuItemConstructorOptions[] = [
@@ -381,7 +374,6 @@ function createAppMenu(translations: any, disabledMap: GenericObject = {}) {
     Menu.setApplicationMenu(menu);
 }
 
-// tslint:disable-next-line: variable-name
 function setAboutPanel(_translations: any = defaultTranslations.default.en) {
     const year = new Date().getFullYear();
     if (process.platform !== 'win32') {
@@ -453,10 +445,15 @@ function createWindow() {
 }
 ipcMain.on('ssl_file_check', (_event: any, cert: string, id: string) => {
     try {
-        // Validate the file path to prevent path traversal attacks
         const resolvedPath = require('path').resolve(cert);
-        // Ensure the path doesn't contain suspicious patterns
-        if (resolvedPath.includes('..') || !require('fs').existsSync(resolvedPath)) {
+        // Validate the file has a certificate-related extension
+        const validExtensions = ['.pem', '.crt', '.key', '.cert', '.ca', '.p12', '.pfx'];
+        const ext = require('path').extname(resolvedPath).toLowerCase();
+        if (!validExtensions.includes(ext) && ext !== '') {
+            win.webContents.send('error-notification', 'common.messages.invalidFilePath');
+            return;
+        }
+        if (!require('fs').existsSync(resolvedPath)) {
             win.webContents.send('error-notification', 'common.messages.invalidFilePath');
             return;
         }
@@ -476,16 +473,12 @@ ipcMain.on('ssl_dialog_open', (_event: any, id: string) => {
         properties: ['openFile'],
     });
     if (saveTo) {
-        try {
-            const data = readFileSync(saveTo[0]);
-            win.webContents.send('ssl_data', {
-                id,
-                data,
-                fileName: saveTo[0],
-            });
-        } catch (e) {
-            throw e;
-        }
+        const data = readFileSync(saveTo[0]);
+        win.webContents.send('ssl_data', {
+            id,
+            data,
+            fileName: saveTo[0],
+        });
     }
 });
 
@@ -517,21 +510,12 @@ app.on('ready', async () => {
     initializeRemote();
     log('[background.ts] Remote initialized');
 
-    // Skip Vue Devtools - deprecated and causes issues with Electron 22+
-    // if (isDevelopment && !process.env.IS_TEST) {
-    //     try {
-    //         await installVueDevtools();
-    //     } catch (e) {
-    //         console.error('Vue Devtools failed to install:', e.toString());
-    //     }
-    // }
     log('[background.ts] Creating app menu...');
     createAppMenu(defaultTranslations.default.en);
     log('[background.ts] Setting about panel...');
     setAboutPanel();
     log('[background.ts] Calling createWindow...');
     createWindow();
-    // tslint:disable-next-line: variable-name
     ipcMain.on(
         'update-menu',
         (_event: any, translations: any, disabledMap: GenericObject) => {

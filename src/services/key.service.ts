@@ -108,7 +108,7 @@ export default class KeyService extends EtcdService implements DataService {
             res = { ...res, ...result };
         });
 
-        return Promise.resolve(res);
+        return res;
     }
 
     public async upsert(
@@ -122,11 +122,10 @@ export default class KeyService extends EtcdService implements DataService {
             const clientOrLease = ttlNum ? this.client.lease(ttlNum) : this.client;
 
             if (ttlNum) {
-                const  tid = setTimeout(() => {
+                setTimeout(() => {
                     clientOrLease.revoke().catch((err: Error) => {
                         console.error('Failed to revoke lease:', err);
                     });
-                    clearTimeout(tid);
                 }, ttlNum * 1000);
             }
 
