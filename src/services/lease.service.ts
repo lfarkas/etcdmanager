@@ -36,7 +36,7 @@ export default class LeaseService extends EtcdService {
     }
 
 
-    public remove(leaseIds: number[]): Promise<ILeaseRevokeResponse[]> {
+    public remove(leaseIds: (string | number)[]): Promise<ILeaseRevokeResponse[]> {
         const promises: Promise<ILeaseRevokeResponse>[] = [];
         leaseIds.forEach((leaseId) => {
             promises.push(this.client.leaseClient.leaseRevoke({

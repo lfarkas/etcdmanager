@@ -411,7 +411,7 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import Messages from '@/lib/messages';
-import { GenericObject, EtcdRole } from '../../types';
+import { GenericObject } from '../../types';
 import LeaseService from '../services/lease.service';
 import { CrudBase, List } from '../lib/crud.class';
 import LeaseEditor from './lease-editor.vue';
@@ -440,7 +440,7 @@ export default class LeaseManager extends CrudBase implements List {
     }
 
     public async created() {
-        this.defaultItem = new EtcdRole();
+        this.defaultItem = { ID: '' };
         this.translateHeaders('leaseManager.columns.id');
 
         const loader = () => {
@@ -482,7 +482,7 @@ export default class LeaseManager extends CrudBase implements List {
             this.$store.commit('message', Messages.error(error));
         }
 
-        return Promise.resolve(this);
+        return this;
     }
 
     public async confirmDelete(): Promise<LeaseManager> {
@@ -496,19 +496,20 @@ export default class LeaseManager extends CrudBase implements List {
         }
 
         this.cancelDelete();
-        return Promise.resolve(this);
+        return this;
     }
 
     public async load(): Promise<LeaseManager> {
         this.loading = true;
         try {
             this.data = await this.etcd.getLeases();
-            this.loading = false;
         } catch (error) {
             this.$store.commit('message', Messages.error(error));
+        } finally {
+            this.loading = false;
         }
 
-        return Promise.resolve(this);
+        return this;
     }
 }
 </script>

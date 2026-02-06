@@ -75,48 +75,6 @@
                                 <v-layout align-center justify-start row>
                                     <v-flex xs4>
                                         <p
-                                            data-test="lease-editor.shortcuts-save-rounded.p"
-                                            class="rounded"
-                                        >
-                                            {{
-                                                `${platformService.getMeta()} + s`
-                                            }}
-                                        </p>
-                                    </v-flex>
-                                    <v-flex xs8>
-                                        <p
-                                            data-test="lease-editor.shortcuts-save-label.p"
-                                            class="label"
-                                        >
-                                            {{
-                                                $t('common.help.shortcuts.save')
-                                            }}
-                                        </p>
-                                    </v-flex>
-                                </v-layout>
-                                <v-layout align-center justify-start row>
-                                    <v-flex xs4>
-                                        <p
-                                            data-test="lease-editor.shortcuts-save-rounded-enter.p"
-                                            class="rounded"
-                                        >
-                                            enter
-                                        </p>
-                                    </v-flex>
-                                    <v-flex xs8>
-                                        <p
-                                            data-test="lease-editor.shortcuts-save-label-enter.p"
-                                            class="label"
-                                        >
-                                            {{
-                                                $t('common.help.shortcuts.save')
-                                            }}
-                                        </p>
-                                    </v-flex>
-                                </v-layout>
-                                <v-layout align-center justify-start row>
-                                    <v-flex xs4>
-                                        <p
                                             data-test="lease-editor.shortcuts-closeEditor-rounded.p"
                                             class="rounded"
                                         >
@@ -269,40 +227,19 @@
 <script lang="ts">
 import Component from 'vue-class-component';
 import { ILeaseTimeToLiveResponse } from 'etcd3';
-import { required, numeric } from 'vuelidate/lib/validators';
-import Messages from '@/lib/messages';
 import { BaseEditor } from '../lib/editor.class';
 import { Prop } from 'vue-property-decorator';
-import LeaseService from '../services/lease.service';
 import { GenericObject } from '../../types';
-import moment from 'moment';
-
-// @ts-ignore
-class LeaseditorError extends Error {
-    constructor(message: any) {
-        super(message);
-        this.name = 'LeaseEditorError';
-    }
-}
 
 @Component({
-    // @ts-ignore
     name: 'lease-editor',
-    validations: {
-        ttl: {
-            required,
-            numeric,
-        },
-    },
 })
 export default class LeaseEditor extends BaseEditor {
     public itemType: string = 'lease';
     public itemId: string = 'ID';
 
     // @ts-ignore
-    @Prop() data: {
-        ID: string;
-    };
+    @Prop() data: GenericObject;
 
     public id: string = '';
 
@@ -314,45 +251,42 @@ export default class LeaseEditor extends BaseEditor {
     private remaining: number = 0;
     // @ts-ignore
     private remainingDate: string = '';
-    private leaseService: LeaseService;
     private interval: any = null;
     public lease: ILeaseTimeToLiveResponse | GenericObject = {};
 
-    constructor() {
-        super();
-        this.leaseService = new LeaseService(
-            this.$store.state.connection.getClient()
-        );
-    }
-
     public async mounted() {
         this.bindDefaultEvents('leaseForm');
-        try {
-            this.lease = await this.leaseService.loadLease(this.id);
-        } catch (error) {
-            this.$store.commit('message', Messages.error(error));
-        }
-        this.keys = this.lease.keys.map((key: Buffer) => {
+        this.lease = this.data;
+        this.keys = (this.lease.keys || []).map((key: Buffer) => {
             return { name: key.toString() };
         });
-        this.remaining = this.lease.TTL;
-        const now = moment();
+        this.remaining = parseInt(this.lease.TTL as string, 10) || 0;
+        this.updateRemainingDate();
         this.interval = setInterval(() => {
-            this.remaining = this.remaining -= 1;
-            const minutes = moment(now).diff(
-                moment(now).subtract(this.remaining, 'seconds'),
-                'minutes'
-            );
-            const hours = moment(now).diff(
-                moment(now).subtract(this.remaining, 'seconds'),
-                'hours'
-            );
-            this.remainingDate = `${hours} hours / ${minutes} minutes / ${this.remaining} seconds`
+            this.remaining -= 1;
+            if (this.remaining <= 0) {
+                this.remaining = 0;
+                clearInterval(this.interval);
+                this.interval = null;
+                this.remainingDate = 'Expired';
+                return;
+            }
+            this.updateRemainingDate();
         }, 1000);
     }
 
+    private updateRemainingDate() {
+        const hours = Math.floor(this.remaining / 3600);
+        const minutes = Math.floor((this.remaining % 3600) / 60);
+        const seconds = this.remaining % 60;
+        this.remainingDate = `${hours} hours / ${minutes} minutes / ${seconds} seconds`;
+    }
+
     public destroyed() {
-        this.interval = clearInterval(this.interval);
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
     }
 }
 </script>
