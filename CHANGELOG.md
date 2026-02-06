@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-02-06
+
+### Changed
+- Lease IDs are now displayed in hexadecimal format, matching etcd CLI and documentation conventions
+
+### Fixed
+- Lease editor: countdown timer double-assignment bug
+- Lease editor: TTL string-to-number type mismatch causing NaN arithmetic
+- Lease editor: crash when viewing leases with no attached keys
+- Lease editor: countdown going negative indefinitely instead of stopping at zero
+- Lease editor: duplicate API call on open (was fetching lease data twice)
+- Lease editor: removed moment.js dependency, using simple math for time display
+- Lease manager: wrong default item type (EtcdRole instead of lease object)
+- Lease manager: loading spinner stuck forever when lease list fetch fails
+- Lease service: remove() type signature accepting number[] instead of (string | number)[]
+- Removed unused error classes (LeaseditorError, KeyError, PermissionEditorError, RoleEditorError, UserEditorError)
+- Removed unused variable assignments in key-manager and user-manager
+- Fixed all 156 ESLint warnings: migrated @ts-ignore to @ts-expect-error, suppressed intentional v-html and console usage, removed unused code
+
 ## [1.3.0] - 2025-02-04
 
 ### Added
