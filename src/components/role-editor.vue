@@ -35,10 +35,12 @@
                                     class="title"
                                 >{{ $t("common.help.infoTitle") }}</h2>
                                 <p data-test="role-editor.spacer-1.p" class="spacer"></p>
+                                <!-- eslint-disable vue/no-v-html -->
                                 <p
                                     data-test="role-editor.help-text.p"
                                     v-html="platformService.getHelp($t('roleEditor.help.text'))"
                                 ></p>
+                                <!-- eslint-enable vue/no-v-html -->
                                 <p data-test="role-editor.spacer-2.p" class="spacer"></p>
                             </v-card-text>
                         </v-card>
@@ -280,14 +282,6 @@ import { Prop } from 'vue-property-decorator';
 import PermissionEditor from './permission-editor.vue';
 import { ValidationError } from '../lib/validation-error.class';
 
-// @ts-ignore
-class RoleEditorError extends Error {
-    constructor(message: any) {
-        super(message);
-        this.name = 'RoleEditorError';
-    }
-}
-
 @Component({
     name: 'role-editor',
     validations: {
@@ -301,11 +295,11 @@ class RoleEditorError extends Error {
     },
 })
 export default class RoleEditor extends BaseEditor {
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: {
         name: string;
     };
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() mode: string;
 
     public itemId: string = 'name';
@@ -376,17 +370,17 @@ export default class RoleEditor extends BaseEditor {
 
     get nameErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.$dirty) {
             return errors;
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.required) {
             errors.push(this.$t('common.validation.required'));
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.alphaNum) {
             errors.push(this.$t('common.validation.alphanumeric'));
         }
@@ -428,7 +422,7 @@ export default class RoleEditor extends BaseEditor {
 
     cancelPermission(): RoleEditor {
         this.permissionDialog = false;
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.$nextTick(this.$refs.name.focus);
         return this;
     }

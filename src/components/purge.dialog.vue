@@ -24,9 +24,9 @@ import Dialog from '../lib/dialog.class';
     name: 'purge-dialog',
 })
 export default class PurgeDialog extends Dialog {
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() open: boolean;
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() itemName: string;
 
 }

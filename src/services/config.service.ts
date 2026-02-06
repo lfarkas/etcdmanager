@@ -54,6 +54,7 @@ export class ConfigService {
         if (oldCfg) {
             await this.replaceConfigState(oldCfg);
         } else {
+            // eslint-disable-next-line no-console
             console.warn(`Profile "${profile}" not found`);
         }
         return this;
@@ -115,6 +116,7 @@ export class ConfigService {
                         return Buffer.from(arr);
                     }
                 }
+                // eslint-disable-next-line no-console
                 console.error('[config.service] Unknown buffer format:', data);
                 throw new Error('Unknown buffer format');
             };

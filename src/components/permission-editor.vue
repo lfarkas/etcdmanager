@@ -150,14 +150,6 @@ import RoleService from '../services/role.service';
 import { Prop } from 'vue-property-decorator';
 import { ValidationError } from '../lib/validation-error.class';
 
-// @ts-ignore
-class PermissionEditorError extends Error {
-    constructor(message: any) {
-        super(message);
-        this.name = 'RoleEditorError';
-    }
-}
-
 @Component({
     name: 'permission-editor',
     validations: {
@@ -170,15 +162,15 @@ class PermissionEditorError extends Error {
     },
 })
 export default class PermissionEditor extends BaseEditor {
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: {
         key: string;
         permission: PermissionObject;
         radios: string;
     };
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() mode: string;
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() name: string;
 
     public itemId: string = 'key';
@@ -222,24 +214,24 @@ export default class PermissionEditor extends BaseEditor {
 
     mounted() {
         this.bindDefaultEvents('permissionForm');
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.$nextTick(this.$refs.key.focus);
         this.radios = 'normal';
     }
 
     get keyErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.$dirty) {
             return errors;
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.required) {
             errors.push(this.$t('common.validation.required'));
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.alphaNum) {
             errors.push(this.$t('common.validation.alphanumeric'));
         }

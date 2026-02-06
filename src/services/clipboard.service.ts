@@ -13,6 +13,7 @@ export class ClipboardService {
                 );
             },
             (error) => {
+                // eslint-disable-next-line no-console
                 console.error('Failed to copy to clipboard:', error);
                 store.commit(
                     'message',

@@ -75,7 +75,7 @@ export class CrudBase extends Vue implements List {
         });
         this.keyboardEvents.bind('meta+f', (e: ExtendedKeyboardEvent) => {
             e.preventDefault();
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.$nextTick(this.$refs.search.focus);
         });
         this.keyboardEvents.bind('meta+p', (e: ExtendedKeyboardEvent) => {
@@ -121,8 +121,8 @@ export class CrudBase extends Vue implements List {
         this.currentItem = { ...{}, ...this.defaultItem };
     }
 
-    // @ts-ignore
-    public editItem(item: GenericObject) {
+    // @ts-expect-error -- untyped
+    public editItem(_item: GenericObject) {
         this.editor = true;
         this.operation = 'edit';
     }
@@ -161,7 +161,7 @@ export class CrudBase extends Vue implements List {
     public async confirmPurge(): Promise<CrudBase> {
         try {
             this.toggleLoading();
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await this.etcd.purge();
             await this.load();
             await this.closeEditor();
@@ -183,7 +183,7 @@ export class CrudBase extends Vue implements List {
 
         try {
             this.toggleLoading();
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await this.etcd.remove(toBeRemoved);
             await this.load();
             await this.closeEditor();
@@ -219,8 +219,8 @@ export class CrudBase extends Vue implements List {
         return this.selected.map(item => item[uniqueKey]);
     }
 
-    // @ts-ignore
-    public async load(...args: any): Promise<CrudBase> {
+    // @ts-expect-error -- untyped
+    public async load(..._args: any): Promise<CrudBase> {
         return Promise.resolve(this);
     }
 

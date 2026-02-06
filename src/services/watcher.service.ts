@@ -111,6 +111,7 @@ export default class WatcherService extends EtcdService implements DataService {
             const watchers = JSON.parse(watchersStr);
             return Array.isArray(watchers) ? watchers : [];
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error('Failed to parse watchers from localStorage:', e);
             return [];
         }

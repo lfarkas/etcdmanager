@@ -38,10 +38,12 @@
                                         class="title"
                                     >{{ $t("common.help.infoTitle") }}</h2>
                                     <p data-test="health.help-spacer-1.p" class="spacer"></p>
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <p
                                         data-test="health.help-text.p"
                                         v-html="platformService.getHelp($t('cluster.help.text'))"
                                     ></p>
+                                    <!-- eslint-enable vue/no-v-html -->
                                     <p data-test="health.help-spacer-2.p" class="spacer"></p>
                                 </v-card-text>
                             </v-card>

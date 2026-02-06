@@ -51,6 +51,7 @@
                                     data-test="lease-editor.tab-spacer-1.p"
                                     class="spacer"
                                 ></p>
+                                <!-- eslint-disable vue/no-v-html -->
                                 <p
                                     data-test="lease-editor.tab-text.p"
                                     v-html="
@@ -59,6 +60,7 @@
                                         )
                                     "
                                 ></p>
+                                <!-- eslint-enable vue/no-v-html -->
                                 <p
                                     data-test="lease-editor.tab-spacer-2.p"
                                     class="spacer"
@@ -238,7 +240,7 @@ export default class LeaseEditor extends BaseEditor {
     public itemType: string = 'lease';
     public itemId: string = 'ID';
 
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: GenericObject;
 
     public id: string = '';
@@ -249,7 +251,7 @@ export default class LeaseEditor extends BaseEditor {
 
     public keys: GenericObject[] = [];
     private remaining: number = 0;
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     private remainingDate: string = '';
     private interval: any = null;
     public lease: ILeaseTimeToLiveResponse | GenericObject = {};

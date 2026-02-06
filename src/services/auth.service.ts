@@ -42,6 +42,7 @@ export class AuthService {
             roles = await this.client.user(this.getUser()).roles();
         } catch (e) {
             // Log the error for debugging purposes
+            // eslint-disable-next-line no-console
             console.error(`Failed to fetch roles for user "${this.getUser()}":`, e);
             // Return false to indicate the user doesn't have the role (safe default)
             return false;

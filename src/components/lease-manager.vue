@@ -149,6 +149,7 @@
                                         data-test="lease-manager.spacer-1.p"
                                         class="spacer"
                                     ></p>
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <p
                                         data-test="lease-manager.text.p"
                                         v-html="
@@ -157,6 +158,7 @@
                                             )
                                         "
                                     ></p>
+                                    <!-- eslint-enable vue/no-v-html -->
                                     <p
                                         data-test="lease-manager.spacer-2.p"
                                         class="spacer"
@@ -460,14 +462,14 @@ export default class LeaseManager extends CrudBase implements List {
         try {
             this.closeEditor();
             const leaseData = await this.etcd.loadLease(item.ID);
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             CrudBase.options.methods.editItem.call(this, item);
             this.currentItem = {
                 ...this.currentItem,
                 ...leaseData,
             };
         } catch (error) {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             CrudBase.options.methods.editItem.call(this, item, false);
             this.$store.commit('message', Messages.error(error));
         }
@@ -475,7 +477,7 @@ export default class LeaseManager extends CrudBase implements List {
 
     public async confirmPurge(): Promise<LeaseManager> {
         try {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await CrudBase.options.methods.confirmPurge.call(this);
             this.$store.commit('message', Messages.success());
         } catch (error) {
@@ -487,7 +489,7 @@ export default class LeaseManager extends CrudBase implements List {
 
     public async confirmDelete(): Promise<LeaseManager> {
         try {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await CrudBase.options.methods.confirmDelete.call(this, 'ID');
             await this.load();
             this.$store.commit('message', Messages.success());

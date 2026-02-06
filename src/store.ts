@@ -17,6 +17,7 @@ function getRemoteApp(): Electron.App {
         try {
             remoteApp = remote.app;
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error('Failed to load @electron/remote:', e);
             throw e;
         }
@@ -132,12 +133,12 @@ export default new Vuex.Store({
         },
         profileUpdate(state, payload) {
             (state.profiles[payload.index] as any) = payload.data;
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.commit('updateCurrentProfile', payload.data);
         },
         profileInsert(state, payload) {
             state.profiles.push(payload as never);
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.commit('updateCurrentProfile', payload);
         },
         watcherConfig(state, payload) {
@@ -198,6 +199,7 @@ export default new Vuex.Store({
                         loadedLang.push(lang);
                         context.commit('config', { language: lang });
                     } catch (e) {
+                        // eslint-disable-next-line no-console
                         console.error(`Failed to load locale "${lang}":`, e);
                         return i18n.locale;
                     }

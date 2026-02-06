@@ -53,6 +53,7 @@
                                     data-test="key-editor.common-help-infoTitle-spacer-1.p"
                                     class="spacer"
                                 ></p>
+                                <!-- eslint-disable vue/no-v-html -->
                                 <p
                                     data-test="key-editor.help-text.p"
                                     v-html="
@@ -61,6 +62,7 @@
                                         )
                                     "
                                 ></p>
+                                <!-- eslint-enable vue/no-v-html -->
                                 <p
                                     data-test="key-editor.common-help-infoTitle-spacer-2.p"
                                     class="spacer"
@@ -424,17 +426,9 @@ import { ValidationError } from '../lib/validation-error.class';
 import { Prop } from 'vue-property-decorator';
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
 
-// @ts-ignore
-class KeyError extends Error {
-    constructor(message: any) {
-        super(message);
-        this.name = 'KeyError';
-    }
-}
-
-// @ts-ignore
+// @ts-expect-error -- untyped
 @Component({
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     name: 'key-editor',
     validations() {
         return {
@@ -462,12 +456,12 @@ export default class KeyEditor extends BaseEditor {
 
     private etcd: KeyService;
 
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: {
         key: string;
         value: string;
     };
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() mode: string;
 
     public key: string = '';
@@ -545,11 +539,11 @@ export default class KeyEditor extends BaseEditor {
 
     get keyErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.$dirty) {
             return errors;
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.required) {
             errors.push(this.$t('common.validation.required'));
         }
@@ -558,11 +552,11 @@ export default class KeyEditor extends BaseEditor {
 
     get valueErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.value.$dirty) {
             return errors;
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.value.required) {
             errors.push(this.$t('common.validation.required').toString());
         }
@@ -572,11 +566,11 @@ export default class KeyEditor extends BaseEditor {
 
     get ttlErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.ttl.$dirty) {
             return errors;
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.ttl.integer) {
             errors.push(this.$t('keyEditor.messages.integerTtl').toString());
         } else if (!this.$v.ttl.maxValue) {

@@ -36,6 +36,7 @@ let menu: Menu | null = null;
 // Environment-conditional logging
 const log = (...args: any[]) => {
     if (isDevelopment) {
+        // eslint-disable-next-line no-console
         console.log(...args);
     }
 };
@@ -116,7 +117,7 @@ function createAppMenu(translations: any, disabledMap: GenericObject = {}) {
         },
         {
             label: get(translations, ['appMenu', 'edit'], 'Edit'),
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             submenu: [
                 {
                     role: 'undo',
@@ -168,7 +169,7 @@ function createAppMenu(translations: any, disabledMap: GenericObject = {}) {
         },
         {
             label: get(translations, ['appMenu', 'view'], 'View'),
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             submenu: [
                 ...(isDevelopment
                     ? [
@@ -291,7 +292,7 @@ function createAppMenu(translations: any, disabledMap: GenericObject = {}) {
         },
         {
             label: get(translations, ['appMenu', 'help'], 'Help'),
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             submenu: [
                 {
                     label: get(
@@ -309,7 +310,7 @@ function createAppMenu(translations: any, disabledMap: GenericObject = {}) {
     ];
 
     template.unshift(
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         isMac
             ? {
                   label: app.getName(),
@@ -464,6 +465,7 @@ ipcMain.on('ssl_file_check', (_event: any, cert: string, id: string) => {
             fileName: resolvedPath,
         });
     } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('Failed to read SSL file:', e);
         win.webContents.send('error-notification', 'common.messages.fileReadError');
     }

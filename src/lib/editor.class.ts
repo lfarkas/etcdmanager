@@ -32,12 +32,12 @@ export class BaseEditor extends Vue {
     }
 
     protected focus(refName: string) {
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.$nextTick(this.$refs[refName].focus);
     }
 
     protected bindDefaultEvents(refName: string) {
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         const form = this.$refs[refName].$el;
         this.keyboardEvents = new Mousetrap(form as HTMLFormElement);
         this.keyboardEvents.bind('meta+s', (e: ExtendedKeyboardEvent) => {
@@ -88,7 +88,7 @@ export class BaseEditor extends Vue {
 
     get title() {
         if (this.editMode) {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             return `${this.$t('common.titles.edit').toString()}: ${this[this.itemId.toLowerCase()]}`;
         }
         return `${this.$t('common.titles.new').toString()} ${capitalize(this.itemType)}`;

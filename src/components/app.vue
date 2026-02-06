@@ -32,13 +32,13 @@ export default class App extends Vue {
     public whatsNew: boolean = true;
     private localStorageService: LocalStorageService;
     private configService: ConfigService;
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     private statsService: StatsService;
     private ipcListeners: { channel: string; listener: (...args: any[]) => void }[] = [];
 
     constructor() {
         super();
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.localStorageService = new LocalStorageService(this.$ls);
         this.configService = new ConfigService(this.localStorageService);
     }
@@ -105,7 +105,7 @@ export default class App extends Vue {
 
     private async loadOrDisabledWatchers(config: GenericObject) {
         const watcherService = new WatcherService(
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.$ls,
             this.$store.state.connection.getClient()
         );
@@ -117,12 +117,12 @@ export default class App extends Vue {
                 watcherEntry.activated = false;
             }
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.$ls.set('watchers', JSON.stringify(watchers));
     }
 
     public async mounted() {
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         const config = this.configService.getConfig();
 
         const replaceConfig = (cfg: any) => {
@@ -165,6 +165,7 @@ export default class App extends Vue {
                 this.$store.commit('etcdConfig', {version: parseFloat(stats.version) });
                 ipcRenderer.send('update-menu', undefined, { lease: this.$store.state.etcd.version > 3.2});
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.error('Failed to get etcd stats:', e);
             }
         }

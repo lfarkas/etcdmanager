@@ -7,10 +7,12 @@
                     >{{ $t('whatsNewDialog.title', {version: version}) }}</v-toolbar-title
                 >
             </v-toolbar>
+            <!-- eslint-disable vue/no-v-html -->
             <v-card-text
                 data-test="whatsnew-dialog.content.card-text"
                 v-html="content"
             ></v-card-text>
+            <!-- eslint-enable vue/no-v-html -->
             <v-checkbox
                 data-test="whatsnew-dialog.dontshow.chechbox"
                 :label="$t('whatsNewDialog.dontshow')"
@@ -43,7 +45,7 @@ const { ipcRenderer } = require('electron');
     name: 'whatsnew-dialog',
 })
 export default class WhatsNewDialog extends Dialog {
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() open: boolean;
 
     public content: string = '';
@@ -52,7 +54,7 @@ export default class WhatsNewDialog extends Dialog {
 
     constructor() {
         super();
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.localStorageService = new LocalStorageService(this.$ls);
     }
 

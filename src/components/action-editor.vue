@@ -85,13 +85,13 @@ export default class ActionEditor extends BaseEditor {
     public itemId: string = 'action';
     public itemType: string = 'action';
 
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: {
         id: Symbol;
         action: GenericObject;
         event: GenericObject;
     };
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() mode: string;
 
     public action: GenericObject = {
@@ -102,7 +102,7 @@ export default class ActionEditor extends BaseEditor {
 
     mounted() {
         this.bindDefaultEvents('actionForm');
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.$nextTick(this.$refs.actionType.focus);
     }
 
@@ -144,7 +144,7 @@ export default class ActionEditor extends BaseEditor {
 
     get title() {
         if (this.editMode) {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             return `${this.$t('common.titles.edit').toString()}`;
         }
         return `${this.$t('common.titles.new').toString()}`;

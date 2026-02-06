@@ -82,9 +82,11 @@
                                 <v-card-text>
                                     <h2 data-test="watcher-manager.infoTitle.h2" class="title">{{ $t("common.help.infoTitle") }}</h2>
                                     <p data-test="watcher-manager.spacer-1.p" class="spacer"></p>
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <p
                                         data-test="watcher-manager.text.p" v-html="platformService.getHelp($t('watcherManager.help.text'))"
                                     ></p>
+                                    <!-- eslint-enable vue/no-v-html -->
                                     <p data-test="watcher-manager.spacer-2.p" class="spacer"></p>
                                 </v-card-text>
                             </v-card>
@@ -301,9 +303,9 @@ export default class WatcherManager extends CrudBase implements List {
 
     constructor() {
         super();
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.etcd = new WatcherService(
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.$ls,
             this.$store.state.connection.getClient()
         );
@@ -393,7 +395,7 @@ export default class WatcherManager extends CrudBase implements List {
 
     public async confirmPurge(): Promise<WatcherManager> {
         try {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await CrudBase.options.methods.confirmPurge.call(this);
             const listeners = this.$store.state.listeners.values();
             for (const watcher of listeners) {
@@ -436,7 +438,7 @@ export default class WatcherManager extends CrudBase implements List {
             const toBeRemoved = this.hasSelection()
                 ? this.getSelectedKeys('name')
                 : [item.name];
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await CrudBase.options.methods.confirmDelete.call(this, 'name');
             this.$store.commit('message', Messages.success());
             await this.unregisterWatchers(toBeRemoved);
@@ -449,7 +451,7 @@ export default class WatcherManager extends CrudBase implements List {
 
     public async editItem(item: WatcherEntry): Promise<WatcherManager> {
         await this.closeEditor();
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         CrudBase.options.methods.editItem.call(this, item);
         this.currentItem = {
             ...this.currentItem,

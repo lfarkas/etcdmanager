@@ -14,6 +14,7 @@ export class LocalStorageService {
             }
             return JSON.parse(value);
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error(`Failed to parse localStorage key "${key}":`, e);
             return null;
         }

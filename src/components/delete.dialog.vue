@@ -38,9 +38,9 @@ import Dialog from '../lib/dialog.class';
     name: 'delete-dialog',
 })
 export default class DeleteDialog extends Dialog {
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() open: boolean;
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() itemName: string;
 }
 </script>

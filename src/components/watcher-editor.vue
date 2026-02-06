@@ -50,6 +50,7 @@
                                     data-test="watcher-editor.spacer-1.p"
                                     class="spacer"
                                 ></p>
+                                <!-- eslint-disable vue/no-v-html -->
                                 <p
                                     data-test="watcher-editor.text.p"
                                     v-html="
@@ -58,6 +59,7 @@
                                         )
                                     "
                                 ></p>
+                                <!-- eslint-enable vue/no-v-html -->
                                 <p
                                     data-test="watcher-editor.spacer-2.p"
                                     class="spacer"
@@ -427,14 +429,14 @@ import { v1 as uuidv1 } from 'uuid';
     },
 })
 export default class WatcherEditor extends BaseEditor {
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: {
         name: string;
         key: string;
         prefix: boolean;
         actions: WatcherAction[];
     };
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() mode: string;
 
     public itemId: string = 'name';
@@ -493,17 +495,17 @@ export default class WatcherEditor extends BaseEditor {
 
     get nameErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.$dirty) {
             return errors;
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.required) {
             errors.push('Item is required');
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.alphaNum) {
             errors.push('Alphanumeric value expected');
         }
@@ -512,11 +514,11 @@ export default class WatcherEditor extends BaseEditor {
 
     get keyErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.$dirty) {
             return errors;
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.key.required) {
             errors.push('Item is required');
         }
@@ -597,9 +599,9 @@ export default class WatcherEditor extends BaseEditor {
             return false;
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         const backend = new WatcherService(
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.$ls,
             this.$store.state.connection.getClient()
         );

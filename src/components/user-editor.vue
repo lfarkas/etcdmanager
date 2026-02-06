@@ -40,10 +40,12 @@
                                     data-test="user-editor.tab-spacer-1.p"
                                     class="spacer"
                                 ></p>
+                                <!-- eslint-disable vue/no-v-html -->
                                 <p
                                     data-test="user-editor.tab-text.p"
                                     v-html="platformService.getHelp($t('userEditor.help.text'))"
                                 ></p>
+                                <!-- eslint-enable vue/no-v-html -->
                                 <p
                                     data-test="user-editor.tab-spacer-2.p"
                                     class="spacer"
@@ -284,16 +286,8 @@ import RoleService from '../services/role.service';
 import store from '../store';
 import { ValidationError } from '../lib/validation-error.class';
 
-// @ts-ignore
-class UserEditorError extends Error {
-    constructor(message: any) {
-        super(message);
-        this.name = 'UserEditorError';
-    }
-}
-
 @Component({
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     name: 'user-editor',
     validations: {
         name: {
@@ -320,12 +314,12 @@ export default class UserEditor extends BaseEditor {
     public itemType: string = 'user';
     public itemId: string = 'name';
 
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() data: {
         name: string;
         roles: Role[];
     };
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     @Prop() mode: string;
 
     public name: string = '';
@@ -357,15 +351,15 @@ export default class UserEditor extends BaseEditor {
 
     get nameErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.$dirty) {
             return errors;
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.required) {
             errors.push(this.$t('common.validation.required'));
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.name.alphaNum) {
             errors.push(this.$t('common.validation.alphanumeric'));
         }
@@ -374,15 +368,15 @@ export default class UserEditor extends BaseEditor {
 
     get passwordErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.password.$dirty) {
             return errors;
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.password.sameAs) {
             errors.push(this.$t('userEditor.messages.pwmatch'));
         }
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.password.pwPattern) {
             errors.push(this.$t('userEditor.messages.invalid'));
         }

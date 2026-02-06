@@ -73,7 +73,7 @@ export default class KeyService extends EtcdService implements DataService {
                     // Use lowercase for consistent permission checking
                     if (permission.permission.toLowerCase().includes('write')) {
                         query.inRange(permission.range);
-                        // @ts-ignore
+                        // @ts-expect-error -- untyped
                         queries.push(query);
                     }
                 }
@@ -124,6 +124,7 @@ export default class KeyService extends EtcdService implements DataService {
             if (ttlNum) {
                 setTimeout(() => {
                     clientOrLease.revoke().catch((err: Error) => {
+                        // eslint-disable-next-line no-console
                         console.error('Failed to revoke lease:', err);
                     });
                 }, ttlNum * 1000);

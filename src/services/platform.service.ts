@@ -3,7 +3,7 @@ import { markdown } from 'markdown';
 
 export class PlatformService {
 
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     private platform: string;
 
     constructor() {

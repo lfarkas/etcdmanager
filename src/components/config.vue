@@ -83,7 +83,9 @@
                                         {{ $t('common.help.infoTitle') }}
                                     </h2>
                                     <p class="spacer"></p>
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <p v-html="getHelp()"></p>
+                                    <!-- eslint-enable vue/no-v-html -->
                                     <p class="spacer"></p>
                                 </v-card-text>
                             </v-card>
@@ -1308,9 +1310,9 @@ import Mousetrap, { ExtendedKeyboardEvent } from 'mousetrap';
 
 const { ipcRenderer } = require('electron');
 
-// @ts-ignore
+// @ts-expect-error -- untyped
 @Component({
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     name: 'config',
     validations: {
         name: {
@@ -1318,7 +1320,7 @@ const { ipcRenderer } = require('electron');
         },
         endpoint: {
             required,
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             or: or(ipAddress, url),
         },
         port: {
@@ -1380,7 +1382,7 @@ export default class Configuration extends Vue {
 
     private localStorageService: LocalStorageService;
     private configService: ConfigService;
-    // @ts-ignore
+    // @ts-expect-error -- untyped
     private authService: AuthService;
     private tabsLength: number = 5;
     private active = 0;
@@ -1404,7 +1406,7 @@ export default class Configuration extends Vue {
         this.certificationChain = Buffer.alloc(0);
         this.platformService = new PlatformService();
         this.inputActionService = new InputActionService();
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.localStorageService = new LocalStorageService(this.$ls);
         this.configService = new ConfigService(this.localStorageService);
     }
@@ -1508,6 +1510,7 @@ export default class Configuration extends Vue {
                     { encoding: 'utf8' }
                 );
             } catch (e) {
+                // eslint-disable-next-line no-console
                 console.error('Failed to write config file:', e);
             }
         };
@@ -1701,7 +1704,7 @@ export default class Configuration extends Vue {
     get certificationErrors() {
         const errors: any = [];
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.certificate.required) {
             errors.push(this.$t('common.validation.required'));
         }
@@ -1711,7 +1714,7 @@ export default class Configuration extends Vue {
     get certKeyErrors() {
         const errors: any = [];
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (this.$v.certKey && this.$v.certKey.required) {
             errors.push(this.$t('common.validation.required'));
         }
@@ -1841,7 +1844,7 @@ export default class Configuration extends Vue {
     private findError() {
         for (const i of Object.keys(this.$v)) {
             if (this.$v[i] && this.$v[i].$error) {
-                // @ts-ignore
+                // @ts-expect-error -- untyped
                 this.active = parseInt(this.$refs[i].$attrs.tab, 10);
                 this.$store.commit(
                     'message',
@@ -2165,7 +2168,7 @@ export default class Configuration extends Vue {
         try {
             const isRoot = await this.authService.isRoot();
 
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             this.configService.setConfig({
                 profiles: [...oldConfig.profiles],
                 ...newConfig,

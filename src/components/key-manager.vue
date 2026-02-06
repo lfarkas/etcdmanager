@@ -314,6 +314,7 @@
                                         data-test="key-manager.common-help-infoTitle-1.p"
                                         class="spacer"
                                     ></p>
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <p
                                         data-test="key-manager.common-help-text.p"
                                         v-html="
@@ -322,6 +323,7 @@
                                             )
                                         "
                                     ></p>
+                                    <!-- eslint-enable vue/no-v-html -->
                                     <p
                                         data-test="key-manager.common-help-infoTitle-2.p"
                                         class="spacer"
@@ -698,7 +700,7 @@ import { set as _set, get as _get } from 'lodash-es';
 import * as Tree from 'list-to-tree';
 import { required } from 'vuelidate/lib/validators';
 
-// @ts-ignore
+// @ts-expect-error -- untyped
 @Component({
     name: 'key-manager',
     validations: {
@@ -732,12 +734,12 @@ export default class KeyManager extends CrudBase implements List {
 
     get separatorErrors() {
         const errors: any = [];
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.separator.$dirty) {
             return errors;
         }
 
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         if (!this.$v.separator.required) {
             errors.push(this.$t('common.validation.required'));
         }
@@ -800,14 +802,14 @@ export default class KeyManager extends CrudBase implements List {
         try {
             this.closeEditor();
             const value = await this.etcd.loadKey(item.key);
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             CrudBase.options.methods.editItem.call(this, item);
             this.currentItem = {
                 ...this.currentItem,
                 ...{ value, key: item.key },
             };
         } catch (error) {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             CrudBase.options.methods.editItem.call(this, item, false);
             this.$store.commit('message', Messages.error(error));
         }
@@ -842,7 +844,7 @@ export default class KeyManager extends CrudBase implements List {
 
     public async confirmPurge(): Promise<KeyManager> {
         try {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await CrudBase.options.methods.confirmPurge.call(this);
             this.$store.commit('message', Messages.success());
         } catch (error) {
@@ -854,8 +856,8 @@ export default class KeyManager extends CrudBase implements List {
 
     public async confirmDelete(): Promise<KeyManager> {
         try {
-            // @ts-ignore
-            const result = await CrudBase.options.methods.confirmDelete.call(
+            // @ts-expect-error -- untyped
+            await CrudBase.options.methods.confirmDelete.call(
                 this,
                 'key'
             );
@@ -939,10 +941,10 @@ export default class KeyManager extends CrudBase implements List {
             return;
         }
         this.$store.commit('separator', this.separator);
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         const config = JSON.parse(this.$ls.get('config'));
         config.separator = this.separator;
-        // @ts-ignore
+        // @ts-expect-error -- untyped
         this.$ls.set('config', JSON.stringify(config));
         const tmp: TreeNodeType[] = [];
         const keyMap = {};

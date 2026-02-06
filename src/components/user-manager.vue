@@ -67,7 +67,9 @@
                                 <v-card-text>
                                     <h2 data-test="user-manager.help-infotitle.h2" class="title">{{ $t("common.help.infoTitle") }}</h2>
                                     <p data-test="user-manager.help-spacer-1.p" class="spacer"></p>
+                                    <!-- eslint-disable vue/no-v-html -->
                                     <p data-test="user-manager.help-text.p" v-html="platformService.getHelp($t('userManager.help.text'))"></p>
+                                    <!-- eslint-enable vue/no-v-html -->
                                     <p data-test="user-manager.help-spacer-2.p" class="spacer"></p>
                                 </v-card-text>
                             </v-card>
@@ -254,16 +256,16 @@ export default class UserManager extends CrudBase implements List {
     public async editItem(item: GenericObject) {
         try {
             this.closeEditor();
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             const roleData = await this.etcd.getUserRoles(item.name);
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             CrudBase.options.methods.editItem.call(this, item);
             this.currentItem = {
                 ...this.currentItem,
                 ...{ name: item.name, roles: roleData },
             };
         } catch (error) {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             CrudBase.options.methods.editItem.call(this, item, false);
             this.$store.commit('message', Messages.error(error));
         }
@@ -271,7 +273,7 @@ export default class UserManager extends CrudBase implements List {
 
     public async confirmPurge(): Promise<UserManager> {
         try {
-            // @ts-ignore
+            // @ts-expect-error -- untyped
             await CrudBase.options.methods.confirmPurge.call(this);
             this.$store.commit('message', Messages.success());
         } catch (error) {
@@ -283,8 +285,8 @@ export default class UserManager extends CrudBase implements List {
 
     public async confirmDelete(): Promise<UserManager> {
         try {
-            // @ts-ignore
-            const result = await CrudBase.options.methods.confirmDelete.call(
+            // @ts-expect-error -- untyped
+            await CrudBase.options.methods.confirmDelete.call(
                 this,
                 'name'
             );

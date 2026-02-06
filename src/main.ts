@@ -46,9 +46,10 @@ Vue.component('delete-dialog', DeleteDialog);
 Vue.component('save-as-dialog', SaveAsDialog);
 Vue.component('message-dialog', MessageDialog);
 
-// @ts-ignore
+// @ts-expect-error -- untyped
 Vue.config.errorHandler = function (err: any, vm: Vue, info: any) {
     if (!(err instanceof ValidationError)) {
+        // eslint-disable-next-line no-console
         console.log(`Error: ${err}\nInfo: ${info}`);
     }
 };
@@ -59,7 +60,7 @@ new Vue({
     store,
     validations: {},
     render: (h) => {
-        //  @ts-ignore
+        // @ts-expect-error -- untyped
         return h(App);
     },
     mounted() {
